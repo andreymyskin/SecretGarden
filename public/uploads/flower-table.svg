@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Цветочный стол">
+  <rect width="1200" height="900" fill="#eaf3ee"/>
+  <ellipse cx="600" cy="620" rx="360" ry="40" fill="#c5ddd0"/>
+  <rect x="250" y="430" width="700" height="190" rx="18" fill="#f7f1ee"/>
+  <circle cx="420" cy="470" r="48" fill="#e8b7b3"/>
+  <circle cx="500" cy="450" r="42" fill="#f0d2ce"/>
+  <circle cx="580" cy="475" r="52" fill="#d89a96"/>
+  <circle cx="670" cy="455" r="38" fill="#e5b8b4"/>
+  <circle cx="740" cy="480" r="45" fill="#f2d0cc"/>
+  <rect x="560" y="510" width="24" height="80" fill="#7fa892"/>
+  <ellipse cx="300" cy="560" rx="55" ry="20" fill="#b7d0c2"/>
+  <ellipse cx="860" cy="560" rx="60" ry="22" fill="#b7d0c2"/>
+  <circle cx="180" cy="180" r="90" fill="#fff" opacity="0.5"/>
+</svg>
