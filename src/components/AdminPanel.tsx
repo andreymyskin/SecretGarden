@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import type { GalleryItem } from "@/lib/types";
 
@@ -166,9 +167,9 @@ export function AdminPanel() {
   if (!authenticated) {
     return (
       <main className="mx-auto flex min-h-screen w-[min(480px,100%)] flex-col justify-center px-5 py-16">
-        <a href="/" className="mb-8 text-sm text-[var(--muted)] hover:text-[var(--ink)]">
+        <Link href="/" className="mb-8 text-sm text-[var(--muted)] hover:text-[var(--ink)]">
           ← На сайт
-        </a>
+        </Link>
         <h1 className="font-[family-name:var(--font-display)] text-4xl">Админ Secret Garden</h1>
         <p className="mt-3 text-[var(--muted)]">
           Войдите, чтобы добавлять и редактировать работы в галерее.
@@ -202,9 +203,9 @@ export function AdminPanel() {
     <main className="mx-auto w-[min(1040px,100%)] px-5 py-12">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <a href="/" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">
+          <Link href="/" className="text-sm text-[var(--muted)] hover:text-[var(--ink)]">
             ← На сайт
-          </a>
+          </Link>
           <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl">
             Управление галереей
           </h1>
