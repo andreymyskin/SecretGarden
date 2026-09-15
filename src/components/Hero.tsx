@@ -12,7 +12,7 @@ export function Hero() {
             "linear-gradient(120deg, rgba(47,61,54,0.28), rgba(47,61,54,0.08)), url('/uploads/evening-garden.svg') center/cover no-repeat",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(232,241,236,0.92)] via-[rgba(232,241,236,0.35)] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(251,243,244,0.92)] via-[rgba(251,243,244,0.35)] to-transparent" />
 
       <div
         className="pointer-events-none absolute -left-10 top-28 h-40 w-40 rounded-full bg-[rgba(229,184,180,0.45)] blur-2xl"

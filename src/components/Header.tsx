@@ -25,7 +25,7 @@ export function Header() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled || open
-          ? "bg-[rgba(238,246,241,0.88)] shadow-[0_10px_30px_rgba(47,61,54,0.06)] backdrop-blur-xl"
+          ? "bg-[rgba(253,247,248,0.88)] shadow-[0_10px_30px_rgba(47,61,54,0.06)] backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >
@@ -66,7 +66,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-[rgba(95,138,112,0.15)] bg-[rgba(238,246,241,0.96)] px-5 py-4 md:hidden">
+        <div className="border-t border-[rgba(95,138,112,0.15)] bg-[rgba(253,247,248,0.96)] px-5 py-4 md:hidden">
           <div className="mx-auto flex w-[min(1120px,100%)] flex-col gap-3">
             {links.map((link) => (
               <a
