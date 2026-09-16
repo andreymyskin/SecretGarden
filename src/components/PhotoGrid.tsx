@@ -7,7 +7,7 @@ import { Lightbox } from "./Lightbox";
 type Props = {
   photos: Photo[];
   title?: string;
-  variant?: "masonry" | "strip" | "grid";
+  variant?: "masonry" | "grid";
   emptyText?: string;
 };
 
@@ -46,13 +46,7 @@ export function PhotoGrid({ photos, title, variant = "masonry", emptyText }: Pro
 
   return (
     <>
-      {variant === "strip" ? (
-        <div className="no-scrollbar -mx-5 mt-10 flex snap-x gap-4 overflow-x-auto px-5 pb-2">
-          {photos.map((photo, index) =>
-            tile(photo, index, "h-[300px] w-[220px] shrink-0 snap-start sm:h-[360px] sm:w-[270px]"),
-          )}
-        </div>
-      ) : variant === "grid" ? (
+      {variant === "grid" ? (
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {photos.map((photo, index) => tile(photo, index, "aspect-[3/4]"))}
         </div>

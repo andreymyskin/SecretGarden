@@ -1,6 +1,6 @@
 import { site, texts } from "@/content/site";
 import type { Photo } from "@/lib/types";
-import { PhotoGrid } from "../PhotoGrid";
+import { PhotoStrip } from "../PhotoStrip";
 
 export function Studio({ photos }: { photos: Photo[] }) {
   const [first, second, third] = photos;
@@ -83,7 +83,7 @@ export function Studio({ photos }: { photos: Photo[] }) {
           <p className="section-lead">
             Работы, снятые в нашем пространстве. Раздел обновляется через админ-панель.
           </p>
-          <PhotoGrid photos={photos} title="Студия" variant="strip" />
+          <PhotoStrip photos={photos} title="Студия" />
         </div>
       </div>
     </section>
