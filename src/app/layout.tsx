@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -8,21 +8,22 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin", "latin-ext"],
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin", "latin-ext", "cyrillic"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Secret Garden — фотопространство",
+  title: "Фотостудия Secret Garden — Тайный Сад, Рязань",
   description:
-    "Пастельное фотопространство Secret Garden: локации, оборудование и галерея работ.",
+    "Винтажная фотостудия Secret Garden в старинном здании Рязани: 9 фотозон, гардероб в аренду, профессиональный свет и спецэффекты.",
+  icons: { icon: "/favicon.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={`${manrope.variable} ${fraunces.variable} h-full antialiased`}>
+    <html lang="ru" className={`${manrope.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
