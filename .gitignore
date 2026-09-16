@@ -34,9 +34,8 @@ yarn-error.log*
 .env*
 !.env.example
 
-# uploaded gallery images (keep seeded SVGs)
+# images uploaded through the admin panel
 /public/uploads/*
-!/public/uploads/*.svg
 !/public/uploads/.gitkeep
 
 # vercel
