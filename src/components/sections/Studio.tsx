@@ -1,42 +1,46 @@
 import { site, texts } from "@/content/site";
 import type { Photo } from "@/lib/types";
 import { PhotoStrip } from "../PhotoStrip";
+import { StrengthIcon } from "../StrengthIcon";
 
-export function Studio({ photos }: { photos: Photo[] }) {
-  const [first, second, third] = photos;
+type Props = { heroPhotos: Photo[]; photos: Photo[] };
+
+export function Studio({ heroPhotos, photos }: Props) {
+  const [first, second] = heroPhotos;
 
   return (
     <section id="studio" className="section pt-32 md:pt-40">
       <div className="section-inner">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <p className="reveal section-eyebrow">Фотостудия в Рязани</p>
             <h1 className="reveal reveal-delay-1 m-0 font-[family-name:var(--font-display)] text-[clamp(2.6rem,6vw,4.4rem)] font-medium leading-[1.05] tracking-[-0.03em] text-[var(--green)]">
               Тайный Сад
               <span className="block text-[var(--rose)]">Secret Garden</span>
             </h1>
-            <p className="reveal reveal-delay-2 mt-4 text-xl font-medium text-[var(--ink)] md:text-2xl">
-              {site.tagline}
-            </p>
-            <p className="reveal reveal-delay-2 mt-4 max-w-xl text-[1.05rem] text-[var(--muted)]">
-              {texts.studio.intro}
-            </p>
+
+            <ul className="reveal reveal-delay-2 m-0 mt-7 grid list-none gap-3.5 p-0">
+              {texts.studio.strengths.map((item) => (
+                <li key={item.text} className="flex items-start gap-3.5">
+                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pink-line)] bg-[var(--pink)] text-[var(--green)]">
+                    <StrengthIcon name={item.icon} className="h-5 w-5" />
+                  </span>
+                  <span className="pt-1.5 text-[0.98rem] leading-snug text-[var(--ink)]">{item.text}</span>
+                </li>
+              ))}
+            </ul>
+
             <div className="reveal reveal-delay-3 mt-8 flex flex-wrap gap-3">
               <a href={site.bookingUrl} target="_blank" rel="noopener noreferrer" className="btn">
                 Записаться
               </a>
-              <a href="#zones" className="btn btn-ghost">
-                Смотреть зоны
+              <a href="#locations" className="btn btn-ghost">
+                Смотреть локации
               </a>
-            </div>
-            <div className="reveal reveal-delay-3 mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-[var(--muted)]">
-              <span><strong className="text-[var(--green)]">9</strong> фотозон</span>
-              <span><strong className="text-[var(--green)]">49 м²</strong> в старинном здании</span>
-              <span><strong className="text-[var(--green)]">до 5</strong> человек в студии</span>
             </div>
           </div>
 
-          <div className="relative grid grid-cols-[1.2fr_0.8fr] gap-4">
+          <div className="relative grid grid-cols-[1.2fr_0.8fr] gap-4 lg:sticky lg:top-28">
             <div
               className="pointer-events-none absolute -left-8 -top-8 h-40 w-40 rounded-full bg-[var(--pink)] blur-2xl"
               style={{ animation: "float 7s ease-in-out infinite" }}
@@ -65,14 +69,6 @@ export function Studio({ photos }: { photos: Photo[] }) {
                 alt="Secret Garden Photostudio"
                 className="w-full max-w-[180px]"
               />
-              {third ? (
-                <img
-                  src={third.url}
-                  alt=""
-                  aria-hidden
-                  className="absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.08]"
-                />
-              ) : null}
             </div>
           </div>
         </div>
@@ -80,9 +76,7 @@ export function Studio({ photos }: { photos: Photo[] }) {
         <div className="mt-20">
           <p className="section-eyebrow">Студия</p>
           <h2 className="section-title">Атмосфера, в которой оживает история</h2>
-          <p className="section-lead">
-            Работы, снятые в нашем пространстве. Раздел обновляется через админ-панель.
-          </p>
+          <p className="section-lead">{texts.studio.intro}</p>
           <PhotoStrip photos={photos} title="Студия" />
         </div>
       </div>

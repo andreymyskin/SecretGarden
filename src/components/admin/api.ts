@@ -1,4 +1,4 @@
-import type { PhotoTarget, SiteContent } from "@/lib/types";
+import type { CollectionKind, PhotoTarget, SiteContent } from "@/lib/types";
 import { photoTargetSegment } from "@/lib/types";
 
 async function parse<T>(response: Response): Promise<T> {
@@ -32,9 +32,12 @@ export const adminApi = {
   deletePhoto: (target: PhotoTarget, photoId: string) =>
     fetch(`/api/photos/${photoTargetSegment(target)}/${photoId}`, { method: "DELETE" }).then(parse),
 
-  createZone: (body: FormData) => fetch("/api/zones", { method: "POST", body }).then(parse),
-  updateZone: (id: string, body: FormData) => fetch(`/api/zones/${id}`, { method: "PUT", body }).then(parse),
-  deleteZone: (id: string) => fetch(`/api/zones/${id}`, { method: "DELETE" }).then(parse),
+  createCollectionItem: (kind: CollectionKind, body: FormData) =>
+    fetch(`/api/collections/${kind}`, { method: "POST", body }).then(parse),
+  updateCollectionItem: (kind: CollectionKind, id: string, body: FormData) =>
+    fetch(`/api/collections/${kind}/${id}`, { method: "PUT", body }).then(parse),
+  deleteCollectionItem: (kind: CollectionKind, id: string) =>
+    fetch(`/api/collections/${kind}/${id}`, { method: "DELETE" }).then(parse),
 
   createEquipment: (body: FormData) => fetch("/api/equipment", { method: "POST", body }).then(parse),
   updateEquipment: (id: string, body: FormData) =>

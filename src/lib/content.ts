@@ -3,11 +3,12 @@ import { promises as fs } from "fs";
 import path from "path";
 import sharp from "sharp";
 import type {
+  CollectionItem,
+  CollectionKind,
   EquipmentItem,
   Photo,
   PhotoTarget,
   SiteContent,
-  Zone,
 } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -18,7 +19,9 @@ const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
 const MAX_IMAGE_WIDTH = 1800;
 
 const emptyContent = (): SiteContent => ({
+  hero: { photos: [] },
   studio: { photos: [] },
+  projects: [],
   zones: [],
   wardrobe: { photos: [] },
   equipment: [],
@@ -42,7 +45,9 @@ export async function getContent(): Promise<SiteContent> {
   const parsed = JSON.parse(raw) as Partial<SiteContent>;
   const base = emptyContent();
   return {
+    hero: parsed.hero ?? base.hero,
     studio: parsed.studio ?? base.studio,
+    projects: parsed.projects ?? base.projects,
     zones: parsed.zones ?? base.zones,
     wardrobe: parsed.wardrobe ?? base.wardrobe,
     equipment: parsed.equipment ?? base.equipment,
@@ -77,10 +82,26 @@ export class ContentError extends Error {
 
 function photosOf(content: SiteContent, target: PhotoTarget): Photo[] {
   if (target.kind === "section") return content[target.section].photos;
-  const zone = content.zones.find((z) => z.id === target.zoneId);
-  if (!zone) throw new ContentError("Зона не найдена", 404);
-  return zone.photos;
+  const item = content[target.collection].find((entry) => entry.id === target.itemId);
+  if (!item) throw new ContentError(collectionLabels[target.collection].notFound, 404);
+  return item.photos;
 }
+
+const collectionLabels: Record<
+  CollectionKind,
+  { notFound: string; needTitle: string; needCover: string }
+> = {
+  zones: {
+    notFound: "Локация не найдена",
+    needTitle: "Укажите название локации",
+    needCover: "Загрузите обложку локации",
+  },
+  projects: {
+    notFound: "Фотопроект не найден",
+    needTitle: "Укажите название фотопроекта",
+    needCover: "Загрузите обложку фотопроекта",
+  },
+};
 
 /* ---------- files ---------- */
 
@@ -170,69 +191,72 @@ export async function removePhoto(target: PhotoTarget, photoId: string): Promise
   await removeUploadedFile(removed.url);
 }
 
-/* ---------- zones ---------- */
+/* ---------- collections (locations & photo projects) ---------- */
 
-export async function createZone(input: {
-  title: string;
-  description: string;
-  cover: File | null;
-}): Promise<Zone> {
+export async function createCollectionItem(
+  collection: CollectionKind,
+  input: { title: string; description: string; cover: File | null },
+): Promise<CollectionItem> {
+  const labels = collectionLabels[collection];
   const title = input.title.trim();
-  if (!title) throw new ContentError("Укажите название зоны");
-  if (!input.cover) throw new ContentError("Загрузите обложку зоны");
+  if (!title) throw new ContentError(labels.needTitle);
+  if (!input.cover) throw new ContentError(labels.needCover);
   validateImageFile(input.cover);
   const cover = await saveUploadedImage(input.cover);
   return mutate((content) => {
-    const zone: Zone = {
+    const item: CollectionItem = {
       id: randomUUID(),
       title,
       description: input.description.trim(),
       cover,
       photos: [],
     };
-    content.zones.push(zone);
-    return zone;
+    content[collection].push(item);
+    return item;
   });
 }
 
-export async function updateZone(
+export async function updateCollectionItem(
+  collection: CollectionKind,
   id: string,
   input: { title?: string; description?: string; cover?: File | null; move?: "up" | "down" },
-): Promise<Zone> {
+): Promise<CollectionItem> {
   let newCover: string | null = null;
   if (input.cover) {
     validateImageFile(input.cover);
     newCover = await saveUploadedImage(input.cover);
   }
-  const { zone, oldCover } = await mutate((content) => {
-    const index = content.zones.findIndex((z) => z.id === id);
-    if (index === -1) throw new ContentError("Зона не найдена", 404);
-    const zone = content.zones[index];
-    const oldCover = zone.cover;
-    if (typeof input.title === "string" && input.title.trim()) zone.title = input.title.trim();
-    if (typeof input.description === "string") zone.description = input.description.trim();
-    if (newCover) zone.cover = newCover;
+  const { item, oldCover } = await mutate((content) => {
+    const list = content[collection];
+    const index = list.findIndex((entry) => entry.id === id);
+    if (index === -1) throw new ContentError(collectionLabels[collection].notFound, 404);
+    const item = list[index];
+    const oldCover = item.cover;
+    if (typeof input.title === "string" && input.title.trim()) item.title = input.title.trim();
+    if (typeof input.description === "string") item.description = input.description.trim();
+    if (newCover) item.cover = newCover;
     if (input.move) {
       const to = input.move === "up" ? index - 1 : index + 1;
-      if (to >= 0 && to < content.zones.length) {
-        content.zones.splice(index, 1);
-        content.zones.splice(to, 0, zone);
+      if (to >= 0 && to < list.length) {
+        list.splice(index, 1);
+        list.splice(to, 0, item);
       }
     }
-    return { zone, oldCover };
+    return { item, oldCover };
   });
   if (newCover && oldCover !== newCover) await removeUploadedFile(oldCover);
-  return zone;
+  return item;
 }
 
-export async function deleteZone(id: string): Promise<void> {
-  const zone = await mutate((content) => {
-    const index = content.zones.findIndex((z) => z.id === id);
-    if (index === -1) throw new ContentError("Зона не найдена", 404);
-    return content.zones.splice(index, 1)[0];
+export async function deleteCollectionItem(collection: CollectionKind, id: string): Promise<void> {
+  const item = await mutate((content) => {
+    const list = content[collection];
+    const index = list.findIndex((entry) => entry.id === id);
+    if (index === -1) throw new ContentError(collectionLabels[collection].notFound, 404);
+    return list.splice(index, 1)[0];
   });
-  await removeUploadedFile(zone.cover);
-  for (const photo of zone.photos) await removeUploadedFile(photo.url);
+  await removeUploadedFile(item.cover);
+  for (const photo of item.photos) await removeUploadedFile(photo.url);
 }
 
 /* ---------- equipment ---------- */

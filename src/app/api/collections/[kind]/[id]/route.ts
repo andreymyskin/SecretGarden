@@ -6,24 +6,29 @@ import {
   requireAdmin,
   stringOrUndefined,
 } from "@/lib/api";
-import { deleteZone, updateZone } from "@/lib/content";
+import { deleteCollectionItem, updateCollectionItem } from "@/lib/content";
+import { isCollectionKind } from "@/lib/types";
 
-type RouteContext = { params: Promise<{ id: string }> };
+type RouteContext = { params: Promise<{ kind: string; id: string }> };
 
 export async function PUT(request: Request, context: RouteContext) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const { id } = await context.params;
+  const { kind, id } = await context.params;
+  if (!isCollectionKind(kind)) {
+    return NextResponse.json({ error: "Неизвестный раздел" }, { status: 404 });
+  }
+
   try {
     const formData = await request.formData();
-    const zone = await updateZone(id, {
+    const item = await updateCollectionItem(kind, id, {
       title: stringOrUndefined(formData.get("title")),
       description: stringOrUndefined(formData.get("description")),
       cover: fileOrNull(formData.get("cover")),
       move: moveOrUndefined(formData.get("move")),
     });
-    return NextResponse.json({ zone });
+    return NextResponse.json({ item });
   } catch (error) {
     return handleError(error);
   }
@@ -33,9 +38,13 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const { id } = await context.params;
+  const { kind, id } = await context.params;
+  if (!isCollectionKind(kind)) {
+    return NextResponse.json({ error: "Неизвестный раздел" }, { status: 404 });
+  }
+
   try {
-    await deleteZone(id);
+    await deleteCollectionItem(kind, id);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return handleError(error);

@@ -1,4 +1,18 @@
 {
+  "hero": {
+    "photos": [
+      {
+        "id": "seed-hero-1",
+        "url": "/images/studio/studio-08.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-hero-2",
+        "url": "/images/studio/studio-25.webp",
+        "caption": ""
+      }
+    ]
+  },
   "studio": {
     "photos": [
       {
@@ -133,6 +147,7 @@
       }
     ]
   },
+  "projects": [],
   "zones": [
     {
       "id": "zone-piano",
@@ -501,5 +516,5 @@
       }
     ]
   },
-  "updatedAt": "2026-09-16T11:32:47.639Z"
+  "updatedAt": "2026-09-23T15:00:00.000Z"
 }

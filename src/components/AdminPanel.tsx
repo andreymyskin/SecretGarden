@@ -4,19 +4,43 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { SiteContent } from "@/lib/types";
 import { adminApi } from "./admin/api";
+import { CollectionManager, type CollectionLabels } from "./admin/CollectionManager";
 import { EquipmentManager } from "./admin/EquipmentManager";
 import { PhotoManager } from "./admin/PhotoManager";
-import { ZonesManager } from "./admin/ZonesManager";
 
-type Tab = "studio" | "zones" | "wardrobe" | "equipment" | "light";
+type Tab = "hero" | "studio" | "projects" | "zones" | "wardrobe" | "equipment" | "light";
 
 const tabs: { id: Tab; label: string }[] = [
+  { id: "hero", label: "Шапка" },
   { id: "studio", label: "Студия" },
-  { id: "zones", label: "Зоны" },
+  { id: "projects", label: "Фотопроекты" },
+  { id: "zones", label: "Локации" },
   { id: "wardrobe", label: "Гардероб" },
   { id: "equipment", label: "Оборудование" },
   { id: "light", label: "Свет" },
 ];
+
+const zoneLabels: CollectionLabels = {
+  newTitle: "Новая локация",
+  addButton: "Добавить локацию",
+  created: "Локация добавлена",
+  updated: "Локация обновлена",
+  deleted: "Локация удалена",
+  confirmDelete: (title) => `Удалить локацию «${title}» вместе с её фотографиями?`,
+  emptyText: "Локаций пока нет.",
+  titlePlaceholder: "Например, Старинный рояль",
+};
+
+const projectLabels: CollectionLabels = {
+  newTitle: "Новый фотопроект",
+  addButton: "Добавить фотопроект",
+  created: "Фотопроект добавлен",
+  updated: "Фотопроект обновлён",
+  deleted: "Фотопроект удалён",
+  confirmDelete: (title) => `Удалить фотопроект «${title}» вместе с его фотографиями?`,
+  emptyText: "Фотопроектов пока нет — добавьте первый.",
+  titlePlaceholder: "Например, Зимняя сказка",
+};
 
 export function AdminPanel() {
   const [checking, setChecking] = useState(true);
@@ -100,7 +124,7 @@ export function AdminPanel() {
         <img src="/brand/logo-green.png" alt="Secret Garden" className="h-20 w-auto self-start" />
         <h1 className="mt-6 font-[family-name:var(--font-display)] text-3xl text-[var(--green)]">Админ-панель</h1>
         <p className="mt-3 text-[var(--muted)]">
-          Войдите, чтобы редактировать фотографии разделов «Студия», «Зоны», «Гардероб», «Оборудование» и «Свет».
+          Войдите, чтобы редактировать фотографии шапки и разделов «Студия», «Фотопроекты», «Локации», «Гардероб», «Оборудование» и «Свет».
         </p>
         <form onSubmit={handleLogin} className="mt-8 space-y-4">
           <div className="field">
@@ -179,18 +203,44 @@ export function AdminPanel() {
       <div className="mt-6">
         {!content ? (
           <p className="text-[var(--muted)]">Загружаем контент…</p>
+        ) : tab === "hero" ? (
+          <PhotoManager
+            target={{ kind: "section", section: "hero" }}
+            photos={content.hero.photos}
+            title="Фотографии шапки"
+            hint="В шапке сайта показываются первые две фотографии: первая — большая вертикальная, вторая — над логотипом. Порядок меняется стрелками."
+            onChanged={refresh}
+            onError={setError}
+            onMessage={setMessage}
+          />
         ) : tab === "studio" ? (
           <PhotoManager
             target={{ kind: "section", section: "studio" }}
             photos={content.studio.photos}
             title="Фотографии студии"
-            hint="Первые три фото показываются в шапке сайта; остальные — в ленте раздела «Студия»."
+            hint="Лента фотографий в разделе «Студия»."
+            onChanged={refresh}
+            onError={setError}
+            onMessage={setMessage}
+          />
+        ) : tab === "projects" ? (
+          <CollectionManager
+            kind="projects"
+            items={content.projects}
+            labels={projectLabels}
             onChanged={refresh}
             onError={setError}
             onMessage={setMessage}
           />
         ) : tab === "zones" ? (
-          <ZonesManager zones={content.zones} onChanged={refresh} onError={setError} onMessage={setMessage} />
+          <CollectionManager
+            kind="zones"
+            items={content.zones}
+            labels={zoneLabels}
+            onChanged={refresh}
+            onError={setError}
+            onMessage={setMessage}
+          />
         ) : tab === "wardrobe" ? (
           <PhotoManager
             target={{ kind: "section", section: "wardrobe" }}

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { Photo, PhotoTarget } from "@/lib/types";
+import { photoTargetSegment } from "@/lib/types";
 import { adminApi } from "./api";
 
 type Props = {
@@ -153,5 +154,5 @@ export function PhotoManager({ target, photos, title, hint, onChanged, onError, 
 }
 
 function photoKey(target: PhotoTarget) {
-  return target.kind === "section" ? target.section : `zone-${target.zoneId}`;
+  return photoTargetSegment(target);
 }

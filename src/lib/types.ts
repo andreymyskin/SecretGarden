@@ -4,13 +4,16 @@ export type Photo = {
   caption: string;
 };
 
-export type Zone = {
+/** A titled card with a cover and its own gallery (a studio location or a photo project). */
+export type CollectionItem = {
   id: string;
   title: string;
   description: string;
   cover: string;
   photos: Photo[];
 };
+
+export type Zone = CollectionItem;
 
 export type EquipmentItem = {
   id: string;
@@ -19,37 +22,48 @@ export type EquipmentItem = {
   image: string;
 };
 
-export type GallerySection = "studio" | "wardrobe" | "light";
+export type GallerySection = "hero" | "studio" | "wardrobe" | "light";
+export type CollectionKind = "zones" | "projects";
 
 export type SiteContent = {
+  hero: { photos: Photo[] };
   studio: { photos: Photo[] };
-  zones: Zone[];
+  projects: CollectionItem[];
+  zones: CollectionItem[];
   wardrobe: { photos: Photo[] };
   equipment: EquipmentItem[];
   light: { photos: Photo[] };
   updatedAt: string;
 };
 
-/** Target of a photo collection: a top-level gallery section or a zone's gallery. */
+/** Target of a photo list: a top-level gallery section or a collection item's gallery. */
 export type PhotoTarget =
   | { kind: "section"; section: GallerySection }
-  | { kind: "zone"; zoneId: string };
+  | { kind: "collection"; collection: CollectionKind; itemId: string };
 
-export const GALLERY_SECTIONS: GallerySection[] = ["studio", "wardrobe", "light"];
+export const GALLERY_SECTIONS: GallerySection[] = ["hero", "studio", "wardrobe", "light"];
+export const COLLECTION_KINDS: CollectionKind[] = ["zones", "projects"];
 
 export function isGallerySection(value: string): value is GallerySection {
   return (GALLERY_SECTIONS as string[]).includes(value);
 }
 
-/** Parses an API target segment: `studio` | `wardrobe` | `light` | `zone-<id>`. */
+export function isCollectionKind(value: string): value is CollectionKind {
+  return (COLLECTION_KINDS as string[]).includes(value);
+}
+
+/** Parses an API target segment: `hero` | `studio` | `wardrobe` | `light` | `zones-<id>` | `projects-<id>`. */
 export function parsePhotoTarget(segment: string): PhotoTarget | null {
   if (isGallerySection(segment)) return { kind: "section", section: segment };
-  if (segment.startsWith("zone-") && segment.length > 5) {
-    return { kind: "zone", zoneId: segment.slice(5) };
+  const dash = segment.indexOf("-");
+  if (dash > 0) {
+    const collection = segment.slice(0, dash);
+    const itemId = segment.slice(dash + 1);
+    if (isCollectionKind(collection) && itemId) return { kind: "collection", collection, itemId };
   }
   return null;
 }
 
 export function photoTargetSegment(target: PhotoTarget): string {
-  return target.kind === "section" ? target.section : `zone-${target.zoneId}`;
+  return target.kind === "section" ? target.section : `${target.collection}-${target.itemId}`;
 }
