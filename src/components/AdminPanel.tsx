@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import type { SiteContent } from "@/lib/types";
+import { isToggleableSection, type SiteContent, type ToggleableSection } from "@/lib/types";
 import { adminApi } from "./admin/api";
 import { CollectionManager, type CollectionLabels } from "./admin/CollectionManager";
 import { EquipmentManager } from "./admin/EquipmentManager";
 import { PhotoManager } from "./admin/PhotoManager";
+import { SectionsManager } from "./admin/SectionsManager";
+import { SecurityManager } from "./admin/SecurityManager";
 
-type Tab = "hero" | "studio" | "projects" | "zones" | "wardrobe" | "equipment" | "light";
+type Tab = ToggleableSection | "hero" | "sections" | "security";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "hero", label: "Шапка" },
@@ -18,6 +20,8 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "wardrobe", label: "Гардероб" },
   { id: "equipment", label: "Оборудование" },
   { id: "light", label: "Свет" },
+  { id: "sections", label: "Разделы" },
+  { id: "security", label: "Безопасность" },
 ];
 
 const zoneLabels: CollectionLabels = {
@@ -46,6 +50,9 @@ export function AdminPanel() {
   const [checking, setChecking] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [recovering, setRecovering] = useState(false);
+  const [recoveryCode, setRecoveryCode] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [content, setContent] = useState<SiteContent | null>(null);
   const [tab, setTab] = useState<Tab>("studio");
@@ -99,6 +106,31 @@ export function AdminPanel() {
     }
   }
 
+  async function handleReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    if (password !== confirmPassword) {
+      setError("Пароли не совпадают");
+      return;
+    }
+    setBusy(true);
+    try {
+      await adminApi.resetPassword(recoveryCode, password);
+      setAuthenticated(true);
+      setRecovering(false);
+      setRecoveryCode("");
+      setPassword("");
+      setConfirmPassword("");
+      setTab("security");
+      await refresh();
+      setMessage("Пароль изменён, вы вошли. Создайте новый код восстановления");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Не удалось сбросить пароль");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleLogout() {
     setBusy(true);
     await adminApi.logout().catch(() => undefined);
@@ -122,30 +154,109 @@ export function AdminPanel() {
           ← На сайт
         </Link>
         <img src="/brand/logo-green.png" alt="Secret Garden" className="h-20 w-auto self-start" />
-        <h1 className="mt-6 font-[family-name:var(--font-display)] text-3xl text-[var(--green)]">Админ-панель</h1>
-        <p className="mt-3 text-[var(--muted)]">
-          Войдите, чтобы редактировать фотографии шапки и разделов «Студия», «Фотопроекты», «Локации», «Гардероб», «Оборудование» и «Свет».
-        </p>
-        <form onSubmit={handleLogin} className="mt-8 space-y-4">
-          <div className="field">
-            <label htmlFor="password">Пароль</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              placeholder="Введите пароль администратора"
-            />
-          </div>
-          {error ? <p className="text-sm text-[#b56b6c]">{error}</p> : null}
-          <button type="submit" className="btn w-full" disabled={busy}>
-            {busy ? "Входим…" : "Войти"}
-          </button>
-        </form>
-        <p className="mt-6 text-xs text-[var(--muted)]">
-          Пароль задаётся переменной окружения <code>ADMIN_PASSWORD</code>.
-        </p>
+        <h1 className="mt-6 font-[family-name:var(--font-display)] text-3xl text-[var(--green)]">
+          {recovering ? "Восстановление пароля" : "Админ-панель"}
+        </h1>
+        {recovering ? (
+          <>
+            <p className="mt-3 text-[var(--muted)]">
+              Введите одноразовый код восстановления, созданный в разделе «Безопасность», и задайте новый пароль.
+            </p>
+            <form onSubmit={handleReset} className="mt-8 space-y-4">
+              <div className="field">
+                <label htmlFor="recovery-code">Код восстановления</label>
+                <input
+                  id="recovery-code"
+                  value={recoveryCode}
+                  onChange={(event) => setRecoveryCode(event.target.value)}
+                  required
+                  autoComplete="one-time-code"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="reset-password">Новый пароль</label>
+                <input
+                  id="reset-password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  placeholder="Не менее 8 символов"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="reset-password-confirm">Повторите пароль</label>
+                <input
+                  id="reset-password-confirm"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  required
+                />
+              </div>
+              {error ? <p className="text-sm text-[#b56b6c]">{error}</p> : null}
+              <button type="submit" className="btn w-full" disabled={busy}>
+                {busy ? "Сохраняем…" : "Задать новый пароль и войти"}
+              </button>
+            </form>
+            <button
+              type="button"
+              className="mt-6 self-start text-sm text-[var(--muted)] hover:text-[var(--green)]"
+              onClick={() => {
+                setRecovering(false);
+                setError("");
+                setPassword("");
+                setConfirmPassword("");
+              }}
+            >
+              ← Вернуться ко входу
+            </button>
+            <p className="mt-6 text-xs text-[var(--muted)]">
+              Нет кода? Удалите на сервере файл <code>data/auth.json</code> — пароль вернётся к значению{" "}
+              <code>ADMIN_PASSWORD</code>.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mt-3 text-[var(--muted)]">
+              Войдите, чтобы управлять фотографиями, публикацией разделов и настройками сайта.
+            </p>
+            <form onSubmit={handleLogin} className="mt-8 space-y-4">
+              <div className="field">
+                <label htmlFor="password">Пароль</label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  placeholder="Введите пароль администратора"
+                />
+              </div>
+              {error ? <p className="text-sm text-[#b56b6c]">{error}</p> : null}
+              <button type="submit" className="btn w-full" disabled={busy}>
+                {busy ? "Входим…" : "Войти"}
+              </button>
+            </form>
+            <button
+              type="button"
+              className="mt-6 self-start text-sm text-[var(--muted)] hover:text-[var(--green)]"
+              onClick={() => {
+                setRecovering(true);
+                setError("");
+                setPassword("");
+              }}
+            >
+              Забыли пароль?
+            </button>
+          </>
+        )}
       </main>
     );
   }
@@ -183,6 +294,11 @@ export function AdminPanel() {
             }}
           >
             {item.label}
+            {content && isToggleableSection(item.id) && !content.sections[item.id] ? (
+              <span className="ml-1.5 text-[0.7rem] font-semibold uppercase tracking-wide opacity-70" title="Раздел скрыт с сайта">
+                скрыт
+              </span>
+            ) : null}
           </button>
         ))}
       </div>
@@ -257,6 +373,15 @@ export function AdminPanel() {
             onError={setError}
             onMessage={setMessage}
           />
+        ) : tab === "sections" ? (
+          <SectionsManager
+            sections={content.sections}
+            onChanged={refresh}
+            onError={setError}
+            onMessage={setMessage}
+          />
+        ) : tab === "security" ? (
+          <SecurityManager onError={setError} onMessage={setMessage} />
         ) : (
           <PhotoManager
             target={{ kind: "section", section: "light" }}

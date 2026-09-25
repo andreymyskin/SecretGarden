@@ -25,6 +25,23 @@ export type EquipmentItem = {
 export type GallerySection = "hero" | "studio" | "wardrobe" | "light";
 export type CollectionKind = "zones" | "projects";
 
+/** Landing blocks that can be hidden from publication in the admin panel. */
+export type ToggleableSection = "studio" | "projects" | "zones" | "wardrobe" | "equipment" | "light";
+export type SectionVisibility = Record<ToggleableSection, boolean>;
+
+export const TOGGLEABLE_SECTIONS: ToggleableSection[] = [
+  "studio",
+  "projects",
+  "zones",
+  "wardrobe",
+  "equipment",
+  "light",
+];
+
+export function isToggleableSection(value: string): value is ToggleableSection {
+  return (TOGGLEABLE_SECTIONS as string[]).includes(value);
+}
+
 export type SiteContent = {
   hero: { photos: Photo[] };
   studio: { photos: Photo[] };
@@ -33,6 +50,7 @@ export type SiteContent = {
   wardrobe: { photos: Photo[] };
   equipment: EquipmentItem[];
   light: { photos: Photo[] };
+  sections: SectionVisibility;
   updatedAt: string;
 };
 

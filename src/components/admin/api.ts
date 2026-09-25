@@ -1,5 +1,17 @@
-import type { CollectionKind, PhotoTarget, SiteContent } from "@/lib/types";
+import type {
+  CollectionKind,
+  PhotoTarget,
+  SectionVisibility,
+  SiteContent,
+  ToggleableSection,
+} from "@/lib/types";
 import { photoTargetSegment } from "@/lib/types";
+
+export type AuthStatus = {
+  customPassword: boolean;
+  hasRecoveryCode: boolean;
+  passwordChangedAt: string | null;
+};
 
 async function parse<T>(response: Response): Promise<T> {
   const data = (await response.json().catch(() => ({}))) as T & { error?: string };
@@ -16,7 +28,32 @@ export const adminApi = {
       body: JSON.stringify({ password }),
     }).then(parse<{ ok: true }>),
   logout: () => fetch("/api/auth/logout", { method: "POST" }).then(parse<{ ok: true }>),
+  authStatus: () => fetch("/api/auth/password", { cache: "no-store" }).then(parse<AuthStatus>),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    fetch("/api/auth/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }).then(parse<{ ok: true; status: AuthStatus }>),
+  createRecoveryCode: (password: string) =>
+    fetch("/api/auth/recovery-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    }).then(parse<{ code: string; status: AuthStatus }>),
+  resetPassword: (recoveryCode: string, newPassword: string) =>
+    fetch("/api/auth/reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ recoveryCode, newPassword }),
+    }).then(parse<{ ok: true }>),
   content: () => fetch("/api/content", { cache: "no-store" }).then(parse<SiteContent>),
+  setSectionVisibility: (section: ToggleableSection, visible: boolean) =>
+    fetch("/api/sections", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ section, visible }),
+    }).then(parse<{ sections: SectionVisibility }>),
 
   uploadPhotos: (target: PhotoTarget, files: File[]) => {
     const body = new FormData();

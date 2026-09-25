@@ -8,8 +8,11 @@ import type {
   EquipmentItem,
   Photo,
   PhotoTarget,
+  SectionVisibility,
   SiteContent,
+  ToggleableSection,
 } from "./types";
+import { TOGGLEABLE_SECTIONS } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
@@ -17,6 +20,9 @@ const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
 
 const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
 const MAX_IMAGE_WIDTH = 1800;
+
+const allVisible = (): SectionVisibility =>
+  Object.fromEntries(TOGGLEABLE_SECTIONS.map((section) => [section, true])) as SectionVisibility;
 
 const emptyContent = (): SiteContent => ({
   hero: { photos: [] },
@@ -26,8 +32,20 @@ const emptyContent = (): SiteContent => ({
   wardrobe: { photos: [] },
   equipment: [],
   light: { photos: [] },
+  sections: allVisible(),
   updatedAt: new Date().toISOString(),
 });
+
+function normalizeSections(value: unknown): SectionVisibility {
+  const result = allVisible();
+  if (value && typeof value === "object") {
+    for (const section of TOGGLEABLE_SECTIONS) {
+      const flag = (value as Record<string, unknown>)[section];
+      if (typeof flag === "boolean") result[section] = flag;
+    }
+  }
+  return result;
+}
 
 async function ensureStorage() {
   await fs.mkdir(DATA_DIR, { recursive: true });
@@ -52,8 +70,19 @@ export async function getContent(): Promise<SiteContent> {
     wardrobe: parsed.wardrobe ?? base.wardrobe,
     equipment: parsed.equipment ?? base.equipment,
     light: parsed.light ?? base.light,
+    sections: normalizeSections(parsed.sections),
     updatedAt: parsed.updatedAt ?? base.updatedAt,
   };
+}
+
+export async function setSectionVisibility(
+  section: ToggleableSection,
+  visible: boolean,
+): Promise<SectionVisibility> {
+  return mutate((content) => {
+    content.sections[section] = visible;
+    return content.sections;
+  });
 }
 
 // Writes are serialized so concurrent admin requests never clobber each other.

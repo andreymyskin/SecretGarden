@@ -6,20 +6,26 @@ import {
   clientKey,
   createSessionToken,
   registerFailure,
+  resetPasswordWithRecoveryCode,
   sessionCookieOptions,
-  verifyPassword,
 } from "@/lib/auth";
+import { ContentError } from "@/lib/content";
 
+/** Public: sets a new password using the one-time recovery code and signs the admin in. */
 export async function POST(request: Request) {
   const key = clientKey(request);
   try {
     assertNotThrottled(key);
-    const body = (await request.json().catch(() => null)) as { password?: unknown } | null;
-    const password = typeof body?.password === "string" ? body.password : "";
+    const body = (await request.json().catch(() => null)) as {
+      recoveryCode?: unknown;
+      newPassword?: unknown;
+    } | null;
 
-    if (!(await verifyPassword(password))) {
-      registerFailure(key);
-      return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
+    try {
+      await resetPasswordWithRecoveryCode(body?.recoveryCode, body?.newPassword);
+    } catch (error) {
+      if (error instanceof ContentError && error.status === 403) registerFailure(key);
+      throw error;
     }
 
     clearFailures(key);

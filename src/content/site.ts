@@ -1,3 +1,5 @@
+import type { SectionVisibility, ToggleableSection } from "@/lib/types";
+
 export const site = {
   name: "Secret Garden",
   fullName: "Фотостудия Тайный Сад Secret Garden",
@@ -18,17 +20,33 @@ export const site = {
   ],
 };
 
-export const nav = [
-  { href: "#studio", label: "Студия" },
-  { href: "#projects", label: "Фотопроекты" },
-  { href: "#locations", label: "Локации" },
-  { href: "#wardrobe", label: "Гардероб" },
-  { href: "#equipment", label: "Оборудование" },
-  { href: "#light", label: "Свет" },
+export type NavLink = { href: string; label: string; section?: ToggleableSection };
+
+export const nav: NavLink[] = [
+  { href: "#studio", label: "Студия", section: "studio" },
+  { href: "#projects", label: "Фотопроекты", section: "projects" },
+  { href: "#locations", label: "Локации", section: "zones" },
+  { href: "#wardrobe", label: "Гардероб", section: "wardrobe" },
+  { href: "#equipment", label: "Оборудование", section: "equipment" },
+  { href: "#light", label: "Свет", section: "light" },
   { href: "#price", label: "Стоимость" },
   { href: "#rules", label: "Правила" },
   { href: "#contacts", label: "Контакты" },
 ];
+
+/** Menu links for the blocks that are currently published. */
+export function visibleNav(sections: SectionVisibility): NavLink[] {
+  return nav.filter((link) => !link.section || sections[link.section]);
+}
+
+export const sectionLabels: Record<ToggleableSection, string> = {
+  studio: "Студия",
+  projects: "Фотопроекты",
+  zones: "Локации",
+  wardrobe: "Гардероб",
+  equipment: "Оборудование",
+  light: "Свет",
+};
 
 export const texts = {
   studio: {

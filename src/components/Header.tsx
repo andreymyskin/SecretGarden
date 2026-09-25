@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { nav, site } from "@/content/site";
+import { nav, site, type NavLink } from "@/content/site";
 
-export function Header() {
+export function Header({ links = nav }: { links?: NavLink[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -24,7 +24,7 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex w-[min(1140px,100%)] items-center justify-between gap-4 px-5 py-3">
-        <Link href="/#studio" className="flex items-center gap-3" aria-label="Secret Garden — на главную">
+        <Link href="/" className="flex items-center gap-3" aria-label="Secret Garden — на главную">
           <img
             src="/brand/logo-green.png"
             alt="Secret Garden Photostudio"
@@ -35,7 +35,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">
-          {nav.map((link) => (
+          {links.map((link) => (
             <a
               key={link.href}
               href={`/${link.href}`}
@@ -67,7 +67,7 @@ export function Header() {
       {open && (
         <div className="border-t border-[var(--pink-line)] bg-white px-5 py-4 lg:hidden">
           <div className="mx-auto flex w-[min(1140px,100%)] flex-col gap-2">
-            {nav.map((link) => (
+            {links.map((link) => (
               <a
                 key={link.href}
                 href={`/${link.href}`}

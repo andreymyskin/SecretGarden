@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { nav, site } from "@/content/site";
+import { nav, site, type NavLink } from "@/content/site";
 
-export function Footer() {
+export function Footer({ links = nav }: { links?: NavLink[] }) {
   return (
     <footer className="border-t border-[var(--pink-line)] bg-white px-5 py-12">
       <div className="mx-auto grid w-[min(1140px,100%)] gap-10 md:grid-cols-[1fr_auto_auto]">
@@ -13,13 +13,16 @@ export function Footer() {
         </div>
 
         <div className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
-          {nav.map((link) => (
+          {links.map((link) => (
             <a key={link.href} href={`/${link.href}`} className="text-[var(--muted)] hover:text-[var(--green)]">
               {link.label}
             </a>
           ))}
           <Link href="/oferta" className="text-[var(--muted)] hover:text-[var(--green)]">
             Договор оферты
+          </Link>
+          <Link href="/privacy" className="text-[var(--muted)] hover:text-[var(--green)]">
+            Политика конфиденциальности
           </Link>
           <Link href="/admin" className="text-[var(--muted)] hover:text-[var(--green)]">
             Админ
