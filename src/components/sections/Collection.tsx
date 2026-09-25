@@ -48,7 +48,7 @@ export function Collection({ id, eyebrow, title, intro, emptyText, items, soft }
                 >
                   <img
                     src={item.cover}
-                    alt={item.title}
+                    alt={`${item.title} — ${eyebrow.toLowerCase()} фотостудии Secret Garden, Рязань`}
                     loading="lazy"
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />

@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Playfair_Display } from "next/font/google";
+import { site } from "@/content/site";
+import { getSiteUrl, seo } from "@/lib/seo";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -15,10 +17,57 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Фотостудия Secret Garden — Тайный Сад, Рязань",
-  description:
-    "Винтажная фотостудия Secret Garden в историческом здании 1910-х годов в центре Рязани: две комнаты, старинный рояль, фотопроекты под ключ, гардероб в аренду, профессиональный свет и спецэффекты.",
-  icons: { icon: "/favicon.png" },
+  metadataBase: getSiteUrl(),
+  title: {
+    default: seo.title,
+    template: "%s — Secret Garden, Рязань",
+  },
+  description: seo.description,
+  keywords: seo.keywords,
+  applicationName: site.name,
+  authors: [{ name: site.owner }],
+  creator: site.owner,
+  publisher: site.name,
+  category: "photography",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    url: "/",
+    siteName: site.fullName,
+    title: seo.shortTitle,
+    description: seo.description,
+    images: [seo.ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: seo.shortTitle,
+    description: seo.description,
+    images: [seo.ogImage.url],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    yandex: process.env.YANDEX_VERIFICATION || undefined,
+  },
+  icons: { icon: "/favicon.png", apple: "/favicon.png" },
+  formatDetection: { telephone: true, email: true, address: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

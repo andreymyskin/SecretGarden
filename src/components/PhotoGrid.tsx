@@ -32,7 +32,7 @@ export function PhotoGrid({ photos, title, variant = "masonry", emptyText }: Pro
     >
       <img
         src={photo.url}
-        alt={photo.caption || title || "Фотография"}
+        alt={photo.caption || `${title || "Фотография"} — фотостудия Secret Garden, Рязань`}
         loading="lazy"
         className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
       />

@@ -71,7 +71,7 @@ export function Lightbox({ photos, index, title, onClose, onChange }: Props) {
         <img
           key={photo.id}
           src={photo.url}
-          alt={photo.caption || title || "Фотография"}
+          alt={photo.caption || `${title || "Фотография"} — фотостудия Secret Garden, Рязань`}
           className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl"
         />
         {hasMany ? (

@@ -18,7 +18,7 @@ export function Equipment({ items }: { items: EquipmentItem[] }) {
                 <div className="aspect-[4/3] overflow-hidden bg-[var(--pink)]">
                   <img
                     src={item.image}
-                    alt={item.title}
+                    alt={`${item.title} — оборудование фотостудии Secret Garden`}
                     loading="lazy"
                     className="h-full w-full object-cover"
                   />
