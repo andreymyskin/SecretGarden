@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { site, texts } from "@/content/site";
 
 export function Contacts() {
@@ -49,6 +50,17 @@ export function Contacts() {
           <a href={site.bookingUrl} target="_blank" rel="noopener noreferrer" className="btn mt-8">
             Записаться онлайн
           </a>
+          <p className="mt-4 max-w-sm text-xs leading-relaxed text-[var(--muted)]">
+            Оформляя запись, вы соглашаетесь с{" "}
+            <Link href="/oferta" className="underline decoration-[var(--pink-deep)] hover:text-[var(--green)]">
+              договором оферты
+            </Link>{" "}
+            и{" "}
+            <Link href="/privacy" className="underline decoration-[var(--pink-deep)] hover:text-[var(--green)]">
+              политикой конфиденциальности
+            </Link>
+            .
+          </p>
         </div>
 
         <div className="card overflow-hidden">
