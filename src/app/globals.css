@@ -36,14 +36,28 @@ html {
   scroll-padding-top: 5.5rem;
 }
 
+/*
+ * Background system
+ * - <html> carries the plain page colour, so the body background is NOT propagated to the
+ *   viewport canvas (that propagation sized the gradients to one screen height and tiled them,
+ *   producing hard pink→white seams every viewport).
+ * - <body> adds two soft, non-repeating ambient glows anchored in pixels near the top.
+ * - Alternating sections use `.section-soft`: a translucent pink tint that fades in and out
+ *   over a fixed distance, so blocks never end with a hard edge.
+ */
+html {
+  background: var(--bg);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  background:
-    radial-gradient(ellipse 70% 40% at 100% 0%, rgba(246, 227, 231, 0.75), transparent 60%),
-    radial-gradient(ellipse 60% 35% at 0% 45%, rgba(246, 227, 231, 0.5), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #ffffff 55%, var(--bg-soft) 100%);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 900px 620px at 100% 0px, rgba(246, 227, 231, 0.8), rgba(246, 227, 231, 0) 70%),
+    radial-gradient(ellipse 760px 640px at 0% 1150px, rgba(246, 227, 231, 0.5), rgba(246, 227, 231, 0) 70%);
+  background-repeat: no-repeat;
   font-family: var(--font-body);
   line-height: 1.6;
 }
@@ -68,9 +82,15 @@ img {
 }
 
 .section-soft {
-  background: linear-gradient(180deg, rgba(246, 227, 231, 0.35), rgba(246, 227, 231, 0.65));
-  border-top: 1px solid var(--pink-line);
-  border-bottom: 1px solid var(--pink-line);
+  --tint: rgba(246, 227, 231, 0.55);
+  --fade: 5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(246, 227, 231, 0) 0,
+    var(--tint) var(--fade),
+    var(--tint) calc(100% - var(--fade)),
+    rgba(246, 227, 231, 0) 100%
+  );
 }
 
 .section-inner {

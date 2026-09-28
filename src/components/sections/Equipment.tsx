@@ -1,9 +1,9 @@
 import { texts } from "@/content/site";
 import type { EquipmentItem } from "@/lib/types";
 
-export function Equipment({ items }: { items: EquipmentItem[] }) {
+export function Equipment({ items, soft = false }: { items: EquipmentItem[]; soft?: boolean }) {
   return (
-    <section id="equipment" className="section section-soft">
+    <section id="equipment" className={`section ${soft ? "section-soft" : ""}`}>
       <div className="section-inner">
         <p className="section-eyebrow">Оборудование</p>
         <h2 className="section-title">{texts.equipment.title}</h2>

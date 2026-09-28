@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackToTop } from "./BackToTop";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { site, visibleNav } from "@/content/site";
@@ -58,6 +59,7 @@ export async function DocumentPage({ eyebrow = "Документы", title, para
         </article>
       </main>
       <Footer links={links} />
+      <BackToTop />
     </>
   );
 }

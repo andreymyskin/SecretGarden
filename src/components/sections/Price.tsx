@@ -1,8 +1,8 @@
 import { site, texts } from "@/content/site";
 
-export function Price() {
+export function Price({ soft = false }: { soft?: boolean }) {
   return (
-    <section id="price" className="section section-soft">
+    <section id="price" className={`section ${soft ? "section-soft" : ""}`}>
       <div className="section-inner">
         <p className="section-eyebrow">Стоимость</p>
         <h2 className="section-title">{texts.price.title}</h2>

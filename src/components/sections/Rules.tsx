@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { texts } from "@/content/site";
 
-export function Rules() {
+export function Rules({ soft = false }: { soft?: boolean }) {
   return (
-    <section id="rules" className="section">
+    <section id="rules" className={`section ${soft ? "section-soft" : ""}`}>
       <div className="section-inner">
         <p className="section-eyebrow">Правила</p>
         <h2 className="section-title">{texts.rules.title}</h2>

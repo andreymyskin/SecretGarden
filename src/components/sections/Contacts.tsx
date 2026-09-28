@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { site, texts } from "@/content/site";
 
-export function Contacts() {
+export function Contacts({ soft = false }: { soft?: boolean }) {
   const mapSrc = `https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(site.mapQuery)}&z=16`;
 
   return (
-    <section id="contacts" className="section section-soft">
+    <section id="contacts" className={`section ${soft ? "section-soft" : ""}`}>
       <div className="section-inner grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <p className="section-eyebrow">Контакты</p>
