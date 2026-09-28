@@ -121,12 +121,14 @@ EOF
 
 ```bash
 npm install --no-audit --no-fund
-NODE_OPTIONS=--max-old-space-size=1536 npm run build
+npm run build:hosting
 ```
+
+`build:hosting` — это обычный `next build`, но с одним рабочим процессом и ограниченными пулами потоков (`NEXT_BUILD_CPUS=1`, `TOKIO_WORKER_THREADS=2`, `UV_THREADPOOL_SIZE=2`, лимит памяти 1,5 ГБ). На виртуальном хостинге действует лимит на число процессов и потоков на аккаунт, а обычный `npm run build` запускает по одному воркеру на каждое ядро сервера (на Beget их 24) и падает с ошибкой `OS can't spawn worker thread: Operation not permitted`.
 
 Сборка занимает 1–3 минуты. Если процесс обрывается словом `Killed` (не хватило памяти на тарифе):
 
-- попробуйте `NODE_OPTIONS=--max-old-space-size=1024 npm run build`;
+- попробуйте `NODE_OPTIONS=--max-old-space-size=1024 npm run build:hosting`;
 - либо соберите проект на своём компьютере (`npm run build` в папке проекта на Windows) и загрузите папку `.next` (без подпапки `.next/cache`) по SFTP/в файловом менеджере в `~/secretgarden62.ru/app/.next`. Зависимости (`node_modules`) при этом должны быть установлены на сервере командой `npm install`.
 
 ### 2.4. Настройте запуск через Passenger
@@ -231,7 +233,7 @@ bash deploy/beget/update.sh
 ### 5.1. Яндекс Вебмастер — https://webmaster.yandex.ru
 
 1. Если secretgarden62.ru уже добавлен (от Tilda) — откройте его; иначе **Добавить сайт** → `https://secretgarden62.ru`.
-2. **Подтверждение прав**: выберите способ «Мета-тег», скопируйте значение `content` (только код, без `<meta …>`), впишите в `.env.local` на сервере в `YANDEX_VERIFICATION=…`, затем `npm run build && touch tmp/restart.txt` (или `bash deploy/beget/update.sh`) и нажмите «Проверить». Способ «DNS-запись» тоже подойдёт: TXT-запись добавляется в панели Beget в разделе DNS домена.
+2. **Подтверждение прав**: выберите способ «Мета-тег», скопируйте значение `content` (только код, без `<meta …>`), впишите в `.env.local` на сервере в `YANDEX_VERIFICATION=…`, затем `npm run build:hosting && touch tmp/restart.txt` (или `bash deploy/beget/update.sh`) и нажмите «Проверить». Способ «DNS-запись» тоже подойдёт: TXT-запись добавляется в панели Beget в разделе DNS домена.
 3. **Индексирование → Файлы Sitemap** → добавьте `https://secretgarden62.ru/sitemap.xml`.
 4. **Индексирование → Переобход страниц** → отправьте `https://secretgarden62.ru/`, `/oferta`, `/privacy`.
 5. **Настройки индексирования → Региональность** → регион сайта «Рязань» (подтверждается по адресу на странице «Контакты»).

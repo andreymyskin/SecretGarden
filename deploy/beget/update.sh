@@ -25,8 +25,8 @@ fi
 echo "==> npm install"
 npm install --no-audit --no-fund
 
-echo "==> next build"
-NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}" npm run build
+echo "==> next build (1 worker: shared hosting limits processes/threads)"
+npm run build:hosting
 
 echo "==> restart passenger"
 mkdir -p tmp

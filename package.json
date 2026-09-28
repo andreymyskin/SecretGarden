@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:hosting": "NEXT_BUILD_CPUS=1 TOKIO_WORKER_THREADS=2 UV_THREADPOOL_SIZE=2 NODE_OPTIONS=--max-old-space-size=1536 next build",
     "start": "next start",
     "lint": "eslint",
     "seed": "node scripts/seed.mjs"
