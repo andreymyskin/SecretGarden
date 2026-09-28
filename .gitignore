@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Admin credentials store (hashed password + recovery code)
 /data/auth.json
+
+# content backups made by deploy/beget/update.sh
+/data/content.backup-*.json

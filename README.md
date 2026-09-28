@@ -59,6 +59,8 @@ npm run build
 npm run start
 ```
 
+Публикация на хостинге Beget и перенос домена с Tilda — пошагово в [DEPLOY.md](DEPLOY.md). Для хостингов с Phusion Passenger точка входа — `server.js`.
+
 ## Переменные окружения
 
 ```bash
