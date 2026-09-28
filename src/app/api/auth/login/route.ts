@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     clearFailures(key);
     const token = await createSessionToken();
     const response = NextResponse.json({ ok: true });
-    response.cookies.set(sessionCookieOptions(token));
+    response.cookies.set(sessionCookieOptions(token, request));
     return response;
   } catch (error) {
     return handleError(error);

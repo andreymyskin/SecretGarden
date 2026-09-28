@@ -95,6 +95,12 @@ export function AdminPanel() {
     setError("");
     try {
       await adminApi.login(password);
+      const me = await adminApi.me();
+      if (!me.authenticated) {
+        throw new Error(
+          "Пароль верный, но браузер не сохранил cookie сессии. Откройте админ-панель по адресу с https:// и проверьте, что cookie не блокируются.",
+        );
+      }
       setAuthenticated(true);
       setPassword("");
       await refresh();

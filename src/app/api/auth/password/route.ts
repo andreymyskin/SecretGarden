@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const status = await changePassword(currentPassword, body?.newPassword);
     const token = await createSessionToken();
     const response = NextResponse.json({ ok: true, status });
-    response.cookies.set(sessionCookieOptions(token));
+    response.cookies.set(sessionCookieOptions(token, request));
     return response;
   } catch (error) {
     return handleError(error);

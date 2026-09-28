@@ -260,25 +260,40 @@ export async function isAuthenticated() {
   return verifySessionToken(cookieStore.get(COOKIE_NAME)?.value);
 }
 
-export function sessionCookieOptions(token: string) {
+/**
+ * Whether the visitor reached us over HTTPS. Behind Beget's Nginx/Apache the app itself
+ * sees plain HTTP, so the forwarded-proto header is checked first. A `Secure` cookie set
+ * over plain HTTP is silently dropped by browsers, which would make every admin action 401.
+ */
+export function isSecureRequest(request: Request): boolean {
+  const forwarded = request.headers.get("x-forwarded-proto");
+  if (forwarded) return forwarded.split(",")[0]!.trim().toLowerCase() === "https";
+  try {
+    return new URL(request.url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+export function sessionCookieOptions(token: string, request: Request) {
   return {
     name: COOKIE_NAME,
     value: token,
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecureRequest(request),
     path: "/",
     maxAge: MAX_AGE_SECONDS,
   };
 }
 
-export function clearSessionCookieOptions() {
+export function clearSessionCookieOptions(request: Request) {
   return {
     name: COOKIE_NAME,
     value: "",
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecureRequest(request),
     path: "/",
     maxAge: 0,
   };
