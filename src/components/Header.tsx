@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { nav, site, type NavLink } from "@/content/site";
+import { SocialLinks } from "@/components/SocialLinks";
 
 export function Header({ links = nav }: { links?: NavLink[] }) {
   const [scrolled, setScrolled] = useState(false);
@@ -24,7 +25,7 @@ export function Header({ links = nav }: { links?: NavLink[] }) {
       }`}
     >
       <div className="mx-auto flex w-[min(1140px,100%)] items-center justify-between gap-4 px-5 py-3">
-        <Link href="/" className="flex items-center gap-3" aria-label="Secret Garden — на главную">
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="Secret Garden — на главную">
           <img
             src="/brand/logo-green.png"
             alt="Secret Garden Photostudio"
@@ -34,34 +35,38 @@ export function Header({ links = nav }: { links?: NavLink[] }) {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-4 lg:flex xl:gap-6">
           {links.map((link) => (
             <a
               key={link.href}
               href={`/${link.href}`}
-              className="relative text-[0.92rem] font-medium text-[var(--muted)] transition-colors hover:text-[var(--green)] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-[var(--rose)] after:transition-all hover:after:w-full"
+              className="relative whitespace-nowrap text-[0.86rem] font-medium text-[var(--muted)] transition-colors hover:text-[var(--green)] after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-[var(--rose)] after:transition-all hover:after:w-full xl:text-[0.92rem]"
             >
               {link.label}
             </a>
           ))}
+          <SocialLinks />
           <a href={site.bookingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm">
             Записаться
           </a>
         </nav>
 
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--pink-deep)] bg-white lg:hidden"
-          aria-label={open ? "Закрыть меню" : "Открыть меню"}
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="flex w-5 flex-col gap-1.5">
-            <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "translate-y-2 rotate-45" : ""}`} />
-            <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "opacity-0" : ""}`} />
-            <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "-translate-y-2 -rotate-45" : ""}`} />
-          </span>
-        </button>
+        <div className="flex items-center gap-3 lg:hidden">
+          <SocialLinks />
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--pink-deep)] bg-white"
+            aria-label={open ? "Закрыть меню" : "Открыть меню"}
+            aria-expanded={open}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="flex w-5 flex-col gap-1.5">
+              <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "translate-y-2 rotate-45" : ""}`} />
+              <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "opacity-0" : ""}`} />
+              <span className={`h-0.5 rounded bg-[var(--green)] transition ${open ? "-translate-y-2 -rotate-45" : ""}`} />
+            </span>
+          </button>
+        </div>
       </div>
 
       {open && (
