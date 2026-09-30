@@ -1,4 +1,5 @@
-import type { SectionVisibility, ToggleableSection } from "@/lib/types";
+import type { OrderableSection, SectionVisibility } from "@/lib/types";
+import { ORDERABLE_SECTIONS, isSectionVisible } from "@/lib/types";
 
 export const site = {
   name: "Secret Garden",
@@ -20,7 +21,7 @@ export const site = {
   ],
 };
 
-export type NavLink = { href: string; label: string; section?: ToggleableSection };
+export type NavLink = { href: string; label: string; section?: OrderableSection };
 
 export const nav: NavLink[] = [
   { href: "#studio", label: "Студия", section: "studio" },
@@ -29,23 +30,29 @@ export const nav: NavLink[] = [
   { href: "#wardrobe", label: "Гардероб", section: "wardrobe" },
   { href: "#equipment", label: "Оборудование", section: "equipment" },
   { href: "#light", label: "Свет", section: "light" },
-  { href: "#price", label: "Стоимость" },
+  { href: "#price", label: "Стоимость", section: "price" },
   { href: "#rules", label: "Правила" },
   { href: "#contacts", label: "Контакты" },
 ];
 
-/** Menu links for the blocks that are currently published. */
-export function visibleNav(sections: SectionVisibility): NavLink[] {
-  return nav.filter((link) => !link.section || sections[link.section]);
+/** Menu links for the published blocks, in the page order chosen in the admin panel; «Правила» and «Контакты» stay last. */
+export function visibleNav(sections: SectionVisibility, order: OrderableSection[] = ORDERABLE_SECTIONS): NavLink[] {
+  const ordered: NavLink[] = [];
+  for (const section of order) {
+    const link = nav.find((entry) => entry.section === section);
+    if (link && isSectionVisible(sections, section)) ordered.push(link);
+  }
+  return [...ordered, ...nav.filter((link) => !link.section)];
 }
 
-export const sectionLabels: Record<ToggleableSection, string> = {
+export const sectionLabels: Record<OrderableSection, string> = {
   studio: "Студия",
   projects: "Фотопроекты",
   zones: "Локации",
   wardrobe: "Гардероб",
   equipment: "Оборудование",
   light: "Свет",
+  price: "Стоимость",
 };
 
 export const texts = {

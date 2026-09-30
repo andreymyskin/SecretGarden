@@ -42,6 +42,39 @@ export function isToggleableSection(value: string): value is ToggleableSection {
   return (TOGGLEABLE_SECTIONS as string[]).includes(value);
 }
 
+/** Landing blocks whose order on the page can be changed in the admin panel. «Правила» and «Контакты» always close the page. */
+export type OrderableSection = ToggleableSection | "price";
+
+export const ORDERABLE_SECTIONS: OrderableSection[] = [...TOGGLEABLE_SECTIONS, "price"];
+
+export function isOrderableSection(value: string): value is OrderableSection {
+  return (ORDERABLE_SECTIONS as string[]).includes(value);
+}
+
+/** Whether a block is currently published; «Стоимость» cannot be hidden. */
+export function isSectionVisible(sections: SectionVisibility, section: OrderableSection): boolean {
+  return section === "price" || sections[section];
+}
+
+/**
+ * Turns an arbitrary stored value into a full permutation of ORDERABLE_SECTIONS:
+ * unknown entries and duplicates are dropped, missing blocks are appended in default order.
+ */
+export function normalizeSectionOrder(value: unknown): OrderableSection[] {
+  const result: OrderableSection[] = [];
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      if (typeof entry === "string" && isOrderableSection(entry) && !result.includes(entry)) {
+        result.push(entry);
+      }
+    }
+  }
+  for (const section of ORDERABLE_SECTIONS) {
+    if (!result.includes(section)) result.push(section);
+  }
+  return result;
+}
+
 export type SiteContent = {
   hero: { photos: Photo[] };
   studio: { photos: Photo[] };
@@ -51,6 +84,7 @@ export type SiteContent = {
   equipment: EquipmentItem[];
   light: { photos: Photo[] };
   sections: SectionVisibility;
+  sectionOrder: OrderableSection[];
   updatedAt: string;
 };
 

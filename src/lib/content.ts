@@ -6,13 +6,14 @@ import type {
   CollectionItem,
   CollectionKind,
   EquipmentItem,
+  OrderableSection,
   Photo,
   PhotoTarget,
   SectionVisibility,
   SiteContent,
   ToggleableSection,
 } from "./types";
-import { TOGGLEABLE_SECTIONS } from "./types";
+import { ORDERABLE_SECTIONS, TOGGLEABLE_SECTIONS, isOrderableSection, normalizeSectionOrder } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
@@ -33,6 +34,7 @@ const emptyContent = (): SiteContent => ({
   equipment: [],
   light: { photos: [] },
   sections: allVisible(),
+  sectionOrder: [...ORDERABLE_SECTIONS],
   updatedAt: new Date().toISOString(),
 });
 
@@ -71,6 +73,7 @@ export async function getContent(): Promise<SiteContent> {
     equipment: parsed.equipment ?? base.equipment,
     light: parsed.light ?? base.light,
     sections: normalizeSections(parsed.sections),
+    sectionOrder: normalizeSectionOrder(parsed.sectionOrder),
     updatedAt: parsed.updatedAt ?? base.updatedAt,
   };
 }
@@ -82,6 +85,26 @@ export async function setSectionVisibility(
   return mutate((content) => {
     content.sections[section] = visible;
     return content.sections;
+  });
+}
+
+/** Replaces the page order of the main blocks; `order` must list every orderable block exactly once. */
+export async function setSectionOrder(order: unknown): Promise<OrderableSection[]> {
+  if (!Array.isArray(order) || order.length !== ORDERABLE_SECTIONS.length) {
+    throw new ContentError("Порядок должен содержать все основные разделы");
+  }
+  const seen = new Set<string>();
+  for (const entry of order) {
+    if (typeof entry !== "string" || !isOrderableSection(entry)) {
+      throw new ContentError("Неизвестный раздел", 404);
+    }
+    if (seen.has(entry)) throw new ContentError("Раздел указан дважды");
+    seen.add(entry);
+  }
+  const next = order as OrderableSection[];
+  return mutate((content) => {
+    content.sectionOrder = [...next];
+    return content.sectionOrder;
   });
 }
 

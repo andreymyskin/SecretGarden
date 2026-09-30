@@ -382,6 +382,7 @@ export function AdminPanel() {
         ) : tab === "sections" ? (
           <SectionsManager
             sections={content.sections}
+            order={content.sectionOrder}
             onChanged={refresh}
             onError={setError}
             onMessage={setMessage}

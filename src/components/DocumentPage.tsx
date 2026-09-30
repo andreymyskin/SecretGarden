@@ -18,7 +18,7 @@ const headingPattern = /^\d+\.\s[А-ЯЁ]/;
 /** Long-form legal document layout shared by the offer agreement and the privacy policy. */
 export async function DocumentPage({ eyebrow = "Документы", title, paragraphs, meta }: Props) {
   const content = await getContent();
-  const links = visibleNav(content.sections);
+  const links = visibleNav(content.sections, content.sectionOrder);
 
   return (
     <>

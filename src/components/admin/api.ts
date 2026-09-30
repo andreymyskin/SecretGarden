@@ -1,5 +1,6 @@
 import type {
   CollectionKind,
+  OrderableSection,
   PhotoTarget,
   SectionVisibility,
   SiteContent,
@@ -54,6 +55,12 @@ export const adminApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ section, visible }),
     }).then(parse<{ sections: SectionVisibility }>),
+  setSectionOrder: (order: OrderableSection[]) =>
+    fetch("/api/sections", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order }),
+    }).then(parse<{ sectionOrder: OrderableSection[] }>),
 
   uploadPhotos: (target: PhotoTarget, files: File[]) => {
     const body = new FormData();
