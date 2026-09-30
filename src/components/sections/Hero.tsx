@@ -24,7 +24,11 @@ export function Hero({ photos, locationsVisible }: Props) {
                   <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pink-line)] bg-[var(--pink)] text-[var(--green)]">
                     <StrengthIcon name={item.icon} className="h-5 w-5" />
                   </span>
-                  <span className="pt-1.5 text-[0.98rem] leading-snug text-[var(--ink)]">{item.text}</span>
+                  <span
+                    className={`pt-1.5 text-[0.98rem] leading-snug text-[var(--ink)] ${"emphasis" in item && item.emphasis ? "font-bold" : ""}`}
+                  >
+                    {item.text}
+                  </span>
                 </li>
               ))}
             </ul>
