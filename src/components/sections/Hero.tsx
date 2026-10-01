@@ -20,14 +20,24 @@ export function Hero({ photos, locationsVisible }: Props) {
 
             <ul className="reveal reveal-delay-2 m-0 mt-7 grid list-none gap-3.5 p-0">
               {texts.studio.strengths.map((item) => (
-                <li key={item.text} className="flex items-start gap-3.5">
+                <li key={item.icon} className="flex items-start gap-3.5">
                   <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pink-line)] bg-[var(--pink)] text-[var(--green)]">
                     <StrengthIcon name={item.icon} className="h-5 w-5" />
                   </span>
-                  <span
-                    className={`pt-1.5 text-[0.98rem] leading-snug text-[var(--ink)] ${"emphasis" in item && item.emphasis ? "font-bold" : ""}`}
-                  >
-                    {item.text}
+                  <span className="pt-1.5 whitespace-pre-line text-[0.98rem] leading-snug text-[var(--ink)]">
+                    {"parts" in item && item.parts ? (
+                      item.parts.map((part, index) =>
+                        part.bold ? (
+                          <strong key={index} className="font-bold">
+                            {part.text}
+                          </strong>
+                        ) : (
+                          <span key={index}>{part.text}</span>
+                        ),
+                      )
+                    ) : (
+                      item.text
+                    )}
                   </span>
                 </li>
               ))}
