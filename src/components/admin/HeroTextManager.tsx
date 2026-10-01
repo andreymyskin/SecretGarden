@@ -63,6 +63,7 @@ export function HeroTextManager({ points, onChanged, onError, onMessage }: Props
       await adminApi.setHeroPoints(draft);
       await onChanged();
       onMessage("Текст шапки сохранён");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       onError(error instanceof Error ? error.message : "Не удалось сохранить");
     } finally {
