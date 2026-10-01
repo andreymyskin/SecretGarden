@@ -13,7 +13,7 @@ export function Price({ soft = false }: { soft?: boolean }) {
             const titledItem = group.items.length === 1 && group.items[0].name === group.title ? group.items[0] : null;
             return (
               <div key={group.title} className="card p-7">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4">
                   <h3 className="m-0 font-[family-name:var(--font-display)] text-2xl text-[var(--green)]">
                     {group.title}
                   </h3>
@@ -21,7 +21,9 @@ export function Price({ soft = false }: { soft?: boolean }) {
                     <p className="m-0 font-[family-name:var(--font-display)] text-2xl text-[var(--rose)]">
                       {titledItem.price}
                     </p>
-                  ) : null}
+                  ) : (
+                    <span />
+                  )}
                 </div>
                 <ul className="m-0 mt-5 list-none space-y-5 p-0">
                   {(titledItem ? [titledItem] : group.items).map((item) => (
