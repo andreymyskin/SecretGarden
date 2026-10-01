@@ -22,6 +22,34 @@ export type EquipmentItem = {
   image: string;
 };
 
+/** A run of text; `bold` marks a fragment the admin highlighted. */
+export type TextPart = {
+  text: string;
+  bold: boolean;
+};
+
+export const STRENGTH_ICONS = ["camera", "building", "piano", "map", "dress", "price"] as const;
+export type StrengthIcon = (typeof STRENGTH_ICONS)[number];
+
+export function isStrengthIcon(value: string): value is StrengthIcon {
+  return (STRENGTH_ICONS as readonly string[]).includes(value);
+}
+
+/** One line in the hero list under the studio title. */
+export type HeroPoint = {
+  id: string;
+  icon: StrengthIcon;
+  parts: TextPart[];
+};
+
+/** One offer card in the price section. */
+export type PriceCard = {
+  id: string;
+  title: string;
+  price: string;
+  description: TextPart[];
+};
+
 export type GallerySection = "hero" | "studio" | "wardrobe" | "light";
 export type CollectionKind = "zones" | "projects";
 
@@ -76,7 +104,7 @@ export function normalizeSectionOrder(value: unknown): OrderableSection[] {
 }
 
 export type SiteContent = {
-  hero: { photos: Photo[] };
+  hero: { photos: Photo[]; points: HeroPoint[] };
   studio: { photos: Photo[] };
   projects: CollectionItem[];
   zones: CollectionItem[];
@@ -85,6 +113,7 @@ export type SiteContent = {
   light: { photos: Photo[] };
   sections: SectionVisibility;
   sectionOrder: OrderableSection[];
+  priceCards: PriceCard[];
   updatedAt: string;
 };
 

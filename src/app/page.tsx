@@ -50,7 +50,7 @@ export default async function HomePage() {
     wardrobe: (soft) => <Wardrobe photos={content.wardrobe.photos} soft={soft} />,
     equipment: (soft) => <Equipment items={content.equipment} soft={soft} />,
     light: (soft) => <Light photos={content.light.photos} soft={soft} />,
-    price: (soft) => <Price soft={soft} />,
+    price: (soft) => <Price cards={content.priceCards} soft={soft} />,
   };
 
   // Published blocks in the admin-chosen order, then the fixed closing blocks; every second
@@ -66,7 +66,7 @@ export default async function HomePage() {
       <StructuredData content={content} />
       <Header links={links} />
       <main>
-        <Hero photos={content.hero.photos} locationsVisible={show.zones} />
+        <Hero photos={content.hero.photos} points={content.hero.points} locationsVisible={show.zones} />
         {blocks.map((block, index) => (
           <Fragment key={block.key}>{block.render(index % 2 === 1)}</Fragment>
         ))}

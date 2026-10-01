@@ -1,9 +1,12 @@
 import type {
   CollectionKind,
+  HeroPoint,
   OrderableSection,
   PhotoTarget,
+  PriceCard,
   SectionVisibility,
   SiteContent,
+  TextPart,
   ToggleableSection,
 } from "@/lib/types";
 import { photoTargetSegment } from "@/lib/types";
@@ -61,6 +64,28 @@ export const adminApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order }),
     }).then(parse<{ sectionOrder: OrderableSection[] }>),
+  setHeroPoints: (points: HeroPoint[]) =>
+    fetch("/api/hero/points", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ points }),
+    }).then(parse<{ points: HeroPoint[] }>),
+  createPriceCard: (card: { title: string; price: string; description: TextPart[] }) =>
+    fetch("/api/price", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(card),
+    }).then(parse<{ card: PriceCard }>),
+  updatePriceCard: (
+    id: string,
+    patch: { title?: string; price?: string; description?: TextPart[]; move?: "up" | "down" },
+  ) =>
+    fetch(`/api/price/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).then(parse<{ card: PriceCard }>),
+  deletePriceCard: (id: string) => fetch(`/api/price/${id}`, { method: "DELETE" }).then(parse<{ ok: true }>),
 
   uploadPhotos: (target: PhotoTarget, files: File[]) => {
     const body = new FormData();

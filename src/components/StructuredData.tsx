@@ -1,4 +1,5 @@
-import { site, texts } from "@/content/site";
+import { site } from "@/content/site";
+import { partsToPlain } from "@/lib/rich-text";
 import type { SiteContent } from "@/lib/types";
 import { absoluteUrl, jsonLd, seo } from "@/lib/seo";
 
@@ -42,17 +43,15 @@ export function StructuredData({ content }: { content: SiteContent }) {
       target: { "@type": "EntryPoint", urlTemplate: site.bookingUrl, actionPlatform: ["https://schema.org/DesktopWebPlatform", "https://schema.org/MobileWebPlatform"] },
       result: { "@type": "Reservation", name: "Бронирование фотостудии" },
     },
-    makesOffer: texts.price.groups.flatMap((group) =>
-      group.items.map((item) => ({
-        "@type": "Offer",
-        name: item.name,
-        description: item.note,
-        price: item.price.replace(/[^\d–-]/g, "").split(/[–-]/)[0],
-        priceCurrency: "RUB",
-        availability: "https://schema.org/InStock",
-        url: site.bookingUrl,
-      })),
-    ),
+    makesOffer: content.priceCards.map((card) => ({
+      "@type": "Offer",
+      name: card.title,
+      description: partsToPlain(card.description),
+      price: card.price.replace(/[^\d–-]/g, "").split(/[–-]/)[0],
+      priceCurrency: "RUB",
+      availability: "https://schema.org/InStock",
+      url: site.bookingUrl,
+    })),
     amenityFeature: [
       { "@type": "LocationFeatureSpecification", name: "Старинный рояль 1930 года", value: true },
       { "@type": "LocationFeatureSpecification", name: "Гримёрная", value: true },

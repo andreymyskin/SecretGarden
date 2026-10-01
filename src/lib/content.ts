@@ -2,18 +2,23 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import sharp from "sharp";
+import { defaultHeroPoints, defaultPriceCards } from "@/content/defaults";
 import type {
   CollectionItem,
   CollectionKind,
   EquipmentItem,
+  HeroPoint,
   OrderableSection,
   Photo,
   PhotoTarget,
+  PriceCard,
   SectionVisibility,
   SiteContent,
+  TextPart,
   ToggleableSection,
 } from "./types";
-import { ORDERABLE_SECTIONS, TOGGLEABLE_SECTIONS, isOrderableSection, normalizeSectionOrder } from "./types";
+import { ORDERABLE_SECTIONS, TOGGLEABLE_SECTIONS, isOrderableSection, isStrengthIcon, normalizeSectionOrder } from "./types";
+import { MAX_RICH_TEXT_LENGTH, normalizeParts, partsToPlain } from "./rich-text";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
@@ -26,7 +31,7 @@ const allVisible = (): SectionVisibility =>
   Object.fromEntries(TOGGLEABLE_SECTIONS.map((section) => [section, true])) as SectionVisibility;
 
 const emptyContent = (): SiteContent => ({
-  hero: { photos: [] },
+  hero: { photos: [], points: defaultHeroPoints() },
   studio: { photos: [] },
   projects: [],
   zones: [],
@@ -35,8 +40,41 @@ const emptyContent = (): SiteContent => ({
   light: { photos: [] },
   sections: allVisible(),
   sectionOrder: [...ORDERABLE_SECTIONS],
+  priceCards: defaultPriceCards(),
   updatedAt: new Date().toISOString(),
 });
+
+function normalizeHeroPoints(value: unknown): HeroPoint[] | null {
+  if (value === undefined) return null;
+  if (!Array.isArray(value)) return null;
+  const points: HeroPoint[] = [];
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") return;
+    const raw = entry as { id?: unknown; icon?: unknown; parts?: unknown; text?: unknown };
+    const parts = normalizeParts(raw.parts ?? raw.text);
+    if (!partsToPlain(parts).trim()) return;
+    const icon = typeof raw.icon === "string" && isStrengthIcon(raw.icon) ? raw.icon : "camera";
+    const id = typeof raw.id === "string" && raw.id ? raw.id : `hero-${index + 1}`;
+    points.push({ id, icon, parts });
+  });
+  return points;
+}
+
+function normalizePriceCards(value: unknown): PriceCard[] | null {
+  if (value === undefined) return null;
+  if (!Array.isArray(value)) return null;
+  const cards: PriceCard[] = [];
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") return;
+    const raw = entry as { id?: unknown; title?: unknown; price?: unknown; description?: unknown };
+    const title = typeof raw.title === "string" ? raw.title.trim() : "";
+    const price = typeof raw.price === "string" ? raw.price.trim() : "";
+    if (!title || !price) return;
+    const id = typeof raw.id === "string" && raw.id ? raw.id : `price-${index + 1}`;
+    cards.push({ id, title, price, description: normalizeParts(raw.description) });
+  });
+  return cards;
+}
 
 function normalizeSections(value: unknown): SectionVisibility {
   const result = allVisible();
@@ -65,7 +103,10 @@ export async function getContent(): Promise<SiteContent> {
   const parsed = JSON.parse(raw) as Partial<SiteContent>;
   const base = emptyContent();
   return {
-    hero: parsed.hero ?? base.hero,
+    hero: {
+      photos: parsed.hero?.photos ?? base.hero.photos,
+      points: normalizeHeroPoints(parsed.hero?.points) ?? defaultHeroPoints(),
+    },
     studio: parsed.studio ?? base.studio,
     projects: parsed.projects ?? base.projects,
     zones: parsed.zones ?? base.zones,
@@ -74,6 +115,7 @@ export async function getContent(): Promise<SiteContent> {
     light: parsed.light ?? base.light,
     sections: normalizeSections(parsed.sections),
     sectionOrder: normalizeSectionOrder(parsed.sectionOrder),
+    priceCards: normalizePriceCards(parsed.priceCards) ?? defaultPriceCards(),
     updatedAt: parsed.updatedAt ?? base.updatedAt,
   };
 }
@@ -105,6 +147,107 @@ export async function setSectionOrder(order: unknown): Promise<OrderableSection[
   return mutate((content) => {
     content.sectionOrder = [...next];
     return content.sectionOrder;
+  });
+}
+
+const MAX_HERO_POINTS = 12;
+const MAX_PRICE_CARDS = 24;
+
+function requireRichText(value: unknown, label: string, allowEmpty: boolean): TextPart[] {
+  const parts = normalizeParts(value);
+  const plain = partsToPlain(parts);
+  if (!allowEmpty && !plain.trim()) throw new ContentError(`Заполните поле «${label}»`);
+  if (plain.length > MAX_RICH_TEXT_LENGTH) {
+    throw new ContentError(`Поле «${label}» длиннее ${MAX_RICH_TEXT_LENGTH} символов`);
+  }
+  return parts;
+}
+
+function freshId(value: unknown): string {
+  return typeof value === "string" && /^[\w-]{1,80}$/.test(value) ? value : randomUUID();
+}
+
+/** Replaces the hero list under the title. */
+export async function setHeroPoints(input: unknown): Promise<HeroPoint[]> {
+  if (!Array.isArray(input)) throw new ContentError("Передайте список пунктов");
+  if (input.length > MAX_HERO_POINTS) throw new ContentError(`Не больше ${MAX_HERO_POINTS} пунктов`);
+  const seen = new Set<string>();
+  const points: HeroPoint[] = input.map((entry, index) => {
+    if (!entry || typeof entry !== "object") throw new ContentError("Некорректный пункт");
+    const raw = entry as { id?: unknown; icon?: unknown; parts?: unknown };
+    if (typeof raw.icon !== "string" || !isStrengthIcon(raw.icon)) {
+      throw new ContentError(`Выберите иконку для пункта ${index + 1}`);
+    }
+    const parts = requireRichText(raw.parts, `Пункт ${index + 1}`, false);
+    let id = freshId(raw.id);
+    if (seen.has(id)) id = randomUUID();
+    seen.add(id);
+    return { id, icon: raw.icon, parts };
+  });
+  return mutate((content) => {
+    content.hero.points = points;
+    return content.hero.points;
+  });
+}
+
+function readPriceCard(input: { title?: unknown; price?: unknown; description?: unknown }, id: string): PriceCard {
+  const title = typeof input.title === "string" ? input.title.trim() : "";
+  const price = typeof input.price === "string" ? input.price.trim() : "";
+  if (!title) throw new ContentError("Укажите заголовок карточки");
+  if (title.length > 160) throw new ContentError("Заголовок карточки длиннее 160 символов");
+  if (!price) throw new ContentError("Укажите стоимость");
+  if (price.length > 40) throw new ContentError("Стоимость длиннее 40 символов");
+  return { id, title, price, description: requireRichText(input.description, "Описание", true) };
+}
+
+export async function createPriceCard(input: {
+  title?: unknown;
+  price?: unknown;
+  description?: unknown;
+}): Promise<PriceCard> {
+  const card = readPriceCard(input, randomUUID());
+  return mutate((content) => {
+    if (content.priceCards.length >= MAX_PRICE_CARDS) {
+      throw new ContentError(`Не больше ${MAX_PRICE_CARDS} карточек`);
+    }
+    content.priceCards.push(card);
+    return card;
+  });
+}
+
+export async function updatePriceCard(
+  id: string,
+  input: { title?: unknown; price?: unknown; description?: unknown; move?: "up" | "down" },
+): Promise<PriceCard> {
+  return mutate((content) => {
+    const index = content.priceCards.findIndex((card) => card.id === id);
+    if (index === -1) throw new ContentError("Карточка не найдена", 404);
+    const current = content.priceCards[index];
+    const next = readPriceCard(
+      {
+        title: input.title === undefined ? current.title : input.title,
+        price: input.price === undefined ? current.price : input.price,
+        description: input.description === undefined ? current.description : input.description,
+      },
+      id,
+    );
+    content.priceCards[index] = next;
+    if (input.move) {
+      const to = input.move === "up" ? index - 1 : index + 1;
+      if (to >= 0 && to < content.priceCards.length) {
+        content.priceCards.splice(index, 1);
+        content.priceCards.splice(to, 0, next);
+      }
+    }
+    return next;
+  });
+}
+
+export async function deletePriceCard(id: string): Promise<void> {
+  await mutate((content) => {
+    const index = content.priceCards.findIndex((card) => card.id === id);
+    if (index === -1) throw new ContentError("Карточка не найдена", 404);
+    content.priceCards.splice(index, 1);
   });
 }
 

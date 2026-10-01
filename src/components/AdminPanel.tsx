@@ -6,11 +6,13 @@ import { isToggleableSection, type SiteContent, type ToggleableSection } from "@
 import { adminApi } from "./admin/api";
 import { CollectionManager, type CollectionLabels } from "./admin/CollectionManager";
 import { EquipmentManager } from "./admin/EquipmentManager";
+import { HeroTextManager } from "./admin/HeroTextManager";
 import { PhotoManager } from "./admin/PhotoManager";
+import { PriceManager } from "./admin/PriceManager";
 import { SectionsManager } from "./admin/SectionsManager";
 import { SecurityManager } from "./admin/SecurityManager";
 
-type Tab = ToggleableSection | "hero" | "sections" | "security";
+type Tab = ToggleableSection | "hero" | "price" | "sections" | "security";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "hero", label: "Шапка" },
@@ -20,6 +22,7 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "wardrobe", label: "Гардероб" },
   { id: "equipment", label: "Оборудование" },
   { id: "light", label: "Свет" },
+  { id: "price", label: "Стоимость" },
   { id: "sections", label: "Разделы" },
   { id: "security", label: "Безопасность" },
 ];
@@ -326,15 +329,24 @@ export function AdminPanel() {
         {!content ? (
           <p className="text-[var(--muted)]">Загружаем контент…</p>
         ) : tab === "hero" ? (
-          <PhotoManager
-            target={{ kind: "section", section: "hero" }}
-            photos={content.hero.photos}
-            title="Фотографии шапки"
-            hint="В шапке сайта показываются первые две фотографии: первая — большая вертикальная, вторая — над логотипом. Порядок меняется стрелками."
-            onChanged={refresh}
-            onError={setError}
-            onMessage={setMessage}
-          />
+          <div className="space-y-10">
+            <HeroTextManager
+              key={content.updatedAt}
+              points={content.hero.points}
+              onChanged={refresh}
+              onError={setError}
+              onMessage={setMessage}
+            />
+            <PhotoManager
+              target={{ kind: "section", section: "hero" }}
+              photos={content.hero.photos}
+              title="Фотографии шапки"
+              hint="В шапке сайта показываются первые две фотографии: первая — большая вертикальная, вторая — над логотипом. Порядок меняется стрелками."
+              onChanged={refresh}
+              onError={setError}
+              onMessage={setMessage}
+            />
+          </div>
         ) : tab === "studio" ? (
           <PhotoManager
             target={{ kind: "section", section: "studio" }}
@@ -375,6 +387,13 @@ export function AdminPanel() {
         ) : tab === "equipment" ? (
           <EquipmentManager
             items={content.equipment}
+            onChanged={refresh}
+            onError={setError}
+            onMessage={setMessage}
+          />
+        ) : tab === "price" ? (
+          <PriceManager
+            cards={content.priceCards}
             onChanged={refresh}
             onError={setError}
             onMessage={setMessage}

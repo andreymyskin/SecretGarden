@@ -1,10 +1,11 @@
-import { site, texts } from "@/content/site";
-import type { Photo } from "@/lib/types";
+import { RichText } from "@/components/RichText";
+import { site } from "@/content/site";
+import type { HeroPoint, Photo } from "@/lib/types";
 import { StrengthIcon } from "../StrengthIcon";
 
-type Props = { photos: Photo[]; locationsVisible: boolean };
+type Props = { photos: Photo[]; points: HeroPoint[]; locationsVisible: boolean };
 
-export function Hero({ photos, locationsVisible }: Props) {
+export function Hero({ photos, points, locationsVisible }: Props) {
   const [first, second] = photos;
 
   return (
@@ -19,25 +20,13 @@ export function Hero({ photos, locationsVisible }: Props) {
             </h1>
 
             <ul className="reveal reveal-delay-2 m-0 mt-7 grid list-none gap-3.5 p-0">
-              {texts.studio.strengths.map((item) => (
-                <li key={item.icon} className="flex items-start gap-3.5">
+              {points.map((point) => (
+                <li key={point.id} className="flex items-start gap-3.5">
                   <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pink-line)] bg-[var(--pink)] text-[var(--green)]">
-                    <StrengthIcon name={item.icon} className="h-5 w-5" />
+                    <StrengthIcon name={point.icon} className="h-5 w-5" />
                   </span>
                   <span className="pt-1.5 whitespace-pre-line text-[0.98rem] leading-snug text-[var(--ink)]">
-                    {"parts" in item && item.parts ? (
-                      item.parts.map((part, index) =>
-                        part.bold ? (
-                          <strong key={index} className="font-bold">
-                            {part.text}
-                          </strong>
-                        ) : (
-                          <span key={index}>{part.text}</span>
-                        ),
-                      )
-                    ) : (
-                      item.text
-                    )}
+                    <RichText parts={point.parts} />
                   </span>
                 </li>
               ))}
