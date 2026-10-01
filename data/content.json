@@ -1,0 +1,528 @@
+{
+  "hero": {
+    "photos": [
+      {
+        "id": "seed-hero-1",
+        "url": "/images/studio/studio-08.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-hero-2",
+        "url": "/images/studio/studio-25.webp",
+        "caption": ""
+      }
+    ]
+  },
+  "studio": {
+    "photos": [
+      {
+        "id": "seed-p52bhoua-0",
+        "url": "/images/studio/studio-08.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-qnaw3yz9-1",
+        "url": "/images/studio/studio-25.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-qrp809s8-2",
+        "url": "/images/studio/studio-02.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-bpw35isk-3",
+        "url": "/images/studio/studio-01.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-athvgq66-4",
+        "url": "/images/studio/studio-26.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-ba5scx65-5",
+        "url": "/images/studio/studio-09.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-0xfr3hzg-6",
+        "url": "/images/studio/studio-13.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-ln60aiu2-7",
+        "url": "/images/studio/studio-15.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-k80ide77-8",
+        "url": "/images/studio/studio-05.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-whmtobny-9",
+        "url": "/images/studio/studio-21.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-rsslmi9o-10",
+        "url": "/images/studio/studio-23.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-k6mhnvpr-11",
+        "url": "/images/studio/studio-10.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-u6esrde1-12",
+        "url": "/images/studio/studio-14.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-7hoyi3vo-13",
+        "url": "/images/studio/studio-19.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-lpzgjlya-14",
+        "url": "/images/studio/studio-18.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-xutq2ewc-15",
+        "url": "/images/studio/studio-07.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-5qfyeyww-16",
+        "url": "/images/studio/studio-12.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-nysaujj1-17",
+        "url": "/images/studio/studio-16.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-stq2by32-18",
+        "url": "/images/studio/studio-17.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-4xh4h4dv-19",
+        "url": "/images/studio/studio-03.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-jwedghoj-20",
+        "url": "/images/studio/studio-04.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-u2e5nszi-21",
+        "url": "/images/studio/studio-06.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-oyxhz3li-22",
+        "url": "/images/studio/studio-11.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-94tgo6qw-23",
+        "url": "/images/studio/studio-20.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-ta3x8w8i-24",
+        "url": "/images/studio/studio-22.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-ozl8zdou-25",
+        "url": "/images/studio/studio-24.webp",
+        "caption": ""
+      }
+    ]
+  },
+  "projects": [],
+  "zones": [
+    {
+      "id": "zone-piano",
+      "title": "Старинный рояль",
+      "description": "Действующий рояль начала прошлого века",
+      "cover": "/images/zones/cover-01.webp",
+      "photos": [
+        {
+          "id": "seed-r33injfp-0",
+          "url": "/images/zones/piano/piano-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-vfonyarp-1",
+          "url": "/images/zones/piano/piano-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-0xxn818f-2",
+          "url": "/images/zones/piano/piano-03.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-jhaqz1me-3",
+          "url": "/images/zones/piano/piano-04.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-guytf1ji-4",
+          "url": "/images/zones/piano/piano-05.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-corridor",
+      "title": "Сводчатый коридор",
+      "description": "Длинный коридор со стилизованными свечами и полукруглыми нишами. В конце сухое дерево с дуплом на фоне бархатного занавеса",
+      "cover": "/images/zones/cover-02.webp",
+      "photos": [
+        {
+          "id": "seed-cuf8v86j-0",
+          "url": "/images/zones/corridor/corridor-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-q26wwd69-1",
+          "url": "/images/zones/corridor/corridor-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-vmsg7cww-2",
+          "url": "/images/zones/corridor/corridor-03.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-ysnjrym9-3",
+          "url": "/images/zones/corridor/corridor-04.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-ail328ss-4",
+          "url": "/images/zones/corridor/corridor-05.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-td3r31w4-5",
+          "url": "/images/zones/corridor/corridor-06.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-table",
+      "title": "Винтажный столик",
+      "description": "Столик с тройным зеркалом и выдвижными ящиками",
+      "cover": "/images/zones/cover-03.webp",
+      "photos": [
+        {
+          "id": "seed-ltbqc0wo-0",
+          "url": "/images/zones/table/table-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-6myi65u6-1",
+          "url": "/images/zones/table/table-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-o0x4pakz-2",
+          "url": "/images/zones/table/table-03.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-buduar",
+      "title": "Будуар",
+      "description": "Гримерная с театральным бархатным занавесом",
+      "cover": "/images/zones/cover-04.webp",
+      "photos": [
+        {
+          "id": "seed-7ve8zixq-0",
+          "url": "/images/zones/buduar/buduar-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-mngvn2rw-1",
+          "url": "/images/zones/buduar/buduar-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-fnjbj6cg-2",
+          "url": "/images/zones/buduar/buduar-03.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-mirror",
+      "title": "Зеркало в траве",
+      "description": "Зеркало в окружении зелени, отражающее интерьеры с разных ракурсов",
+      "cover": "/images/zones/cover-05.webp",
+      "photos": [
+        {
+          "id": "seed-2zuq81z3-0",
+          "url": "/images/zones/mirror/mirror-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-jjtszrqo-1",
+          "url": "/images/zones/mirror/mirror-02.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-sofa",
+      "title": "Старинный диванчик",
+      "description": "Винтажный диванчик в окружении цветочных композиций",
+      "cover": "/images/zones/cover-06.webp",
+      "photos": [
+        {
+          "id": "seed-1j93haru-0",
+          "url": "/images/zones/sofa/sofa-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-651xnj0s-1",
+          "url": "/images/zones/sofa/sofa-02.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-rogoz",
+      "title": "Арка из рогоза",
+      "description": "Проход между комнатами увитый расчесанными листьями рогоза",
+      "cover": "/images/zones/cover-07.webp",
+      "photos": [
+        {
+          "id": "seed-owew8552-0",
+          "url": "/images/zones/rogoz/rogoz-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-tjcvlhnf-1",
+          "url": "/images/zones/rogoz/rogoz-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-2xjwkzwt-2",
+          "url": "/images/zones/rogoz/rogoz-03.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-flower",
+      "title": "Цветочные композиции",
+      "description": "Уникальные цветочные композиции из гортензий, злаков и других декоративных элементов",
+      "cover": "/images/zones/cover-08.webp",
+      "photos": [
+        {
+          "id": "seed-r9hyafzj-0",
+          "url": "/images/zones/flower/flower-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-wij1u1zj-1",
+          "url": "/images/zones/flower/flower-02.webp",
+          "caption": ""
+        }
+      ]
+    },
+    {
+      "id": "zone-waiting",
+      "title": "Зона ожидания в русском стиле",
+      "description": "Мягкий диван, стилизованное окно и березки, засушенные местные травы и красавец самовар. А дополнят образ расшитые бисером кокошники.",
+      "cover": "/images/zones/cover-09.webp",
+      "photos": [
+        {
+          "id": "seed-els3zzj5-0",
+          "url": "/images/zones/waiting/waiting-01.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-35zoqpfk-1",
+          "url": "/images/zones/waiting/waiting-02.webp",
+          "caption": ""
+        },
+        {
+          "id": "seed-qr35xnpv-2",
+          "url": "/images/zones/waiting/waiting-03.webp",
+          "caption": ""
+        }
+      ]
+    }
+  ],
+  "wardrobe": {
+    "photos": [
+      {
+        "id": "seed-5w8u59le-0",
+        "url": "/images/wardrobe/dress-01.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-o61ytwc4-1",
+        "url": "/images/wardrobe/dress-02.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-ojdywos0-2",
+        "url": "/images/wardrobe/dress-03.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-z1pg9qaq-3",
+        "url": "/images/wardrobe/dress-04.webp",
+        "caption": ""
+      }
+    ]
+  },
+  "equipment": [
+    {
+      "id": "equipment-1",
+      "title": "Осветитель Aputure Amaran 300c",
+      "description": "Полноцветный светодиодный светильник с точечным источником мощностью 300 Вт, сочетающий в себе полноцветное управление RGBWW, универсальность оптического и мягкого света, встроенные элементы управления и высококачественный световой поток.",
+      "image": "/images/equipment/item-01.webp"
+    },
+    {
+      "id": "equipment-2",
+      "title": "Осветитель Godox SL100BI",
+      "description": "Компактный и очень мощный светодиодный осветитель, выдающий световой поток с регулируемой цветовой температурой 2800K~6500K (в широком диапазоне от «теплого» до «холодного» белого цвета) и регулируемой яркостью от 0 до 100%.",
+      "image": "/images/equipment/item-02.webp"
+    },
+    {
+      "id": "equipment-3",
+      "title": "Октобоксы Triopo 90 см",
+      "description": "Октобоксы Triopo позволяют получить мягкий светотеневой рисунок без резких переходов и теней на снимаемом объекте или фоне. В студии доступны 2 октобокса с двумя тканевыми рассеивателями + Соты, которые ограничивают световой поток и делают его более узким, оставляя только параллельные лучи, позволяя усилить контраст в снимке.",
+      "image": "/images/equipment/item-03.webp"
+    },
+    {
+      "id": "equipment-4",
+      "title": "Генератор тумана Falcon Eyes F-1200R",
+      "description": "Устройство для создания дымовых спецэффектов мощностью 1200 Вт. Даст возможность наиболее реалистичным образом создать ощущение тумана на снимках. Управление производится беспроводным пультом дистанционного управления.",
+      "image": "/images/equipment/item-04.webp"
+    },
+    {
+      "id": "equipment-5",
+      "title": "Генератор снега Falcon Eyes SM-1200",
+      "description": "Генератор снега создает эффект настоящего снегопада, что позволяет применять его в качестве спецэффекта зимнего времени года. Размер хлопьев регулируется проводным пультом управления.",
+      "image": "/images/equipment/item-05.webp"
+    },
+    {
+      "id": "equipment-6",
+      "title": "Портативная колонка Fiero Dream FR600",
+      "description": "Портативная Bluetooth колонка мощностью 60 Вт поможет вам создать необходимую атмосферу во время фотосессии.",
+      "image": "/images/equipment/item-06.webp"
+    },
+    {
+      "id": "equipment-7",
+      "title": "Стремянка",
+      "description": "Стильная стремянка позволит подобрать интересный ракурс.",
+      "image": "/images/equipment/item-07.webp"
+    },
+    {
+      "id": "equipment-8",
+      "title": "Отпариватель ручной для одежды MIE Graze",
+      "description": "Легкий, удобный и компактный ручной отпариватель для одежды MIE Graze поможет привести в порядок одежду.",
+      "image": "/images/equipment/item-08.webp"
+    },
+    {
+      "id": "equipment-9",
+      "title": "Все для чая",
+      "description": "Мы угостим Вас чаем или кофе.",
+      "image": "/images/equipment/item-09.webp"
+    }
+  ],
+  "light": {
+    "photos": [
+      {
+        "id": "seed-qnw5hij3-0",
+        "url": "/images/light/light-01.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-6332j3nn-1",
+        "url": "/images/light/light-02.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-7x1m707z-2",
+        "url": "/images/light/light-03.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-5u69nvjf-3",
+        "url": "/images/light/light-04.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-q4w2np5w-4",
+        "url": "/images/light/light-05.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-nx8rq0qe-5",
+        "url": "/images/light/light-06.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-2n4sf2kd-6",
+        "url": "/images/light/light-07.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-sky2j3tg-7",
+        "url": "/images/light/light-08.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-g3jcns0s-8",
+        "url": "/images/light/light-09.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-t198rvyl-9",
+        "url": "/images/light/light-10.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-pizeif19-10",
+        "url": "/images/light/light-11.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-5gg711sd-11",
+        "url": "/images/light/light-12.webp",
+        "caption": ""
+      },
+      {
+        "id": "seed-g2qcxaz8-12",
+        "url": "/images/light/light-13.webp",
+        "caption": ""
+      }
+    ]
+  },
+  "sections": {
+    "studio": true,
+    "projects": true,
+    "zones": true,
+    "wardrobe": true,
+    "equipment": true,
+    "light": true
+  },
+  "updatedAt": "2026-09-25T12:00:00.000Z"
+}
