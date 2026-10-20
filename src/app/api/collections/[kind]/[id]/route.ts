@@ -26,6 +26,7 @@ export async function PUT(request: Request, context: RouteContext) {
       title: stringOrUndefined(formData.get("title")),
       description: stringOrUndefined(formData.get("description")),
       cover: fileOrNull(formData.get("cover")),
+      existingCover: stringOrUndefined(formData.get("existingCover")),
       move: moveOrUndefined(formData.get("move")),
     });
     return NextResponse.json({ item });

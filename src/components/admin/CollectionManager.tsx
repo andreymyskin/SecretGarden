@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import type { CollectionItem, CollectionKind } from "@/lib/types";
 import { adminApi } from "./api";
 import { PhotoManager } from "./PhotoManager";
+import { UploadedPhotoPicker } from "./UploadedPhotoPicker";
 
 export type CollectionLabels = {
   newTitle: string;
@@ -32,6 +33,7 @@ export function CollectionManager({ kind, items, labels, onChanged, onError, onM
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [cover, setCover] = useState<File | null>(null);
+  const [existingCover, setExistingCover] = useState<string | null>(null);
 
   const editing = items.find((item) => item.id === editingId) ?? null;
 
@@ -40,6 +42,7 @@ export function CollectionManager({ kind, items, labels, onChanged, onError, onM
     setTitle("");
     setDescription("");
     setCover(null);
+    setExistingCover(null);
   }
 
   function startEdit(item: CollectionItem) {
@@ -47,6 +50,7 @@ export function CollectionManager({ kind, items, labels, onChanged, onError, onM
     setTitle(item.title);
     setDescription(item.description);
     setCover(null);
+    setExistingCover(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -78,6 +82,7 @@ export function CollectionManager({ kind, items, labels, onChanged, onError, onM
     body.set("title", title);
     body.set("description", description);
     if (cover) body.set("cover", cover);
+    else if (existingCover) body.set("existingCover", existingCover);
     const ok = await run(
       () =>
         editing
@@ -123,9 +128,22 @@ export function CollectionManager({ kind, items, labels, onChanged, onError, onM
               id={`${kind}-cover`}
               type="file"
               accept="image/*"
-              required={!editing}
-              onChange={(event) => setCover(event.target.files?.[0] ?? null)}
+              required={!editing && !existingCover}
+              onChange={(event) => {
+                setCover(event.target.files?.[0] ?? null);
+                if (event.target.files?.[0]) setExistingCover(null);
+              }}
             />
+            <div className="mt-3">
+              <UploadedPhotoPicker
+                disabled={busy}
+                selectedUrl={existingCover}
+                onPick={(urls) => {
+                  setExistingCover(urls[0] ?? null);
+                  setCover(null);
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">

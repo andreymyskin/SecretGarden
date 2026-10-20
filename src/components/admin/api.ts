@@ -1,3 +1,4 @@
+import type { LibraryImage } from "@/lib/content";
 import type {
   CollectionKind,
   HeroPoint,
@@ -87,6 +88,13 @@ export const adminApi = {
     }).then(parse<{ card: PriceCard }>),
   deletePriceCard: (id: string) => fetch(`/api/price/${id}`, { method: "DELETE" }).then(parse<{ ok: true }>),
 
+  library: () => fetch("/api/library", { cache: "no-store" }).then(parse<{ images: LibraryImage[] }>),
+  addExistingPhotos: (target: PhotoTarget, urls: string[]) =>
+    fetch(`/api/photos/${photoTargetSegment(target)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls }),
+    }).then(parse),
   uploadPhotos: (target: PhotoTarget, files: File[]) => {
     const body = new FormData();
     files.forEach((file) => body.append("images", file));

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { Photo, PhotoTarget } from "@/lib/types";
 import { photoTargetSegment } from "@/lib/types";
 import { adminApi } from "./api";
+import { UploadedPhotoPicker } from "./UploadedPhotoPicker";
 
 type Props = {
   target: PhotoTarget;
@@ -66,6 +67,18 @@ export function PhotoManager({ target, photos, title, hint, onChanged, onError, 
             {busy ? "Сохраняем…" : "Загрузить"}
           </button>
         </div>
+      </div>
+      <div className="mt-4">
+        <UploadedPhotoPicker
+          multiple
+          disabled={busy}
+          onPick={(urls) =>
+            run(
+              () => adminApi.addExistingPhotos(target, urls),
+              urls.length === 1 ? "Фото добавлено из загруженных" : `Добавлено фото: ${urls.length}`,
+            )
+          }
+        />
       </div>
 
       {photos.length === 0 ? (

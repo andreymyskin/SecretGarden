@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import type { EquipmentItem } from "@/lib/types";
 import { adminApi } from "./api";
+import { UploadedPhotoPicker } from "./UploadedPhotoPicker";
 
 type Props = {
   items: EquipmentItem[];
@@ -17,6 +18,7 @@ export function EquipmentManager({ items, onChanged, onError, onMessage }: Props
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [existingImage, setExistingImage] = useState<string | null>(null);
 
   const editing = items.find((item) => item.id === editingId) ?? null;
 
@@ -25,6 +27,7 @@ export function EquipmentManager({ items, onChanged, onError, onMessage }: Props
     setTitle("");
     setDescription("");
     setImage(null);
+    setExistingImage(null);
   }
 
   function startEdit(item: EquipmentItem) {
@@ -32,6 +35,7 @@ export function EquipmentManager({ items, onChanged, onError, onMessage }: Props
     setTitle(item.title);
     setDescription(item.description);
     setImage(null);
+    setExistingImage(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -57,6 +61,7 @@ export function EquipmentManager({ items, onChanged, onError, onMessage }: Props
     body.set("title", title);
     body.set("description", description);
     if (image) body.set("image", image);
+    else if (existingImage) body.set("existingImage", existingImage);
     const ok = await run(
       () => (editing ? adminApi.updateEquipment(editing.id, body) : adminApi.createEquipment(body)),
       editing ? "Позиция обновлена" : "Позиция добавлена",
@@ -99,9 +104,22 @@ export function EquipmentManager({ items, onChanged, onError, onMessage }: Props
               id="eq-image"
               type="file"
               accept="image/*"
-              required={!editing}
-              onChange={(event) => setImage(event.target.files?.[0] ?? null)}
+              required={!editing && !existingImage}
+              onChange={(event) => {
+                setImage(event.target.files?.[0] ?? null);
+                if (event.target.files?.[0]) setExistingImage(null);
+              }}
             />
+            <div className="mt-3">
+              <UploadedPhotoPicker
+                disabled={busy}
+                selectedUrl={existingImage}
+                onPick={(urls) => {
+                  setExistingImage(urls[0] ?? null);
+                  setImage(null);
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">

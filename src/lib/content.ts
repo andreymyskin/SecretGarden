@@ -7,6 +7,7 @@ import type {
   CollectionItem,
   CollectionKind,
   EquipmentItem,
+  GallerySection,
   HeroPoint,
   OrderableSection,
   Photo,
@@ -329,14 +330,96 @@ export async function saveUploadedImage(file: File): Promise<string> {
   return `/uploads/${filename}`;
 }
 
-async function removeUploadedFile(url: string) {
-  if (!url.startsWith("/uploads/")) return;
-  const filePath = path.join(process.cwd(), "public", url);
-  try {
-    await fs.unlink(filePath);
-  } catch {
-    // Already gone — nothing to clean up.
+const SITE_IMAGE_PREFIXES = ["/uploads/", "/images/"];
+
+/** A photo already stored on the server and safe to reuse in another section. */
+export type LibraryImage = {
+  url: string;
+  places: string[];
+  caption: string;
+};
+
+function rememberImage(
+  map: Map<string, LibraryImage>,
+  url: string,
+  place: string,
+  caption = "",
+) {
+  if (!SITE_IMAGE_PREFIXES.some((prefix) => url.startsWith(prefix))) return;
+  const current = map.get(url) ?? { url, places: [], caption: "" };
+  if (!current.places.includes(place)) current.places.push(place);
+  if (!current.caption && caption) current.caption = caption;
+  map.set(url, current);
+}
+
+function imagesInContent(content: SiteContent): Map<string, LibraryImage> {
+  const map = new Map<string, LibraryImage>();
+  const galleries: [GallerySection, string][] = [
+    ["hero", "Шапка"],
+    ["studio", "Студия"],
+    ["wardrobe", "Гардероб"],
+    ["light", "Свет"],
+  ];
+  for (const [section, place] of galleries) {
+    for (const photo of content[section].photos) rememberImage(map, photo.url, place, photo.caption);
   }
+  for (const item of content.projects) {
+    rememberImage(map, item.cover, `Фотопроекты: ${item.title}`);
+    for (const photo of item.photos) rememberImage(map, photo.url, `Фотопроекты: ${item.title}`, photo.caption);
+  }
+  for (const item of content.zones) {
+    rememberImage(map, item.cover, `Локации: ${item.title}`);
+    for (const photo of item.photos) rememberImage(map, photo.url, `Локации: ${item.title}`, photo.caption);
+  }
+  for (const item of content.equipment) rememberImage(map, item.image, `Оборудование: ${item.title}`);
+  return map;
+}
+
+/** Every photo already on the site, plus files left in the uploads folder. */
+export async function listLibrary(): Promise<LibraryImage[]> {
+  const content = await getContent();
+  const map = imagesInContent(content);
+  try {
+    const names = await fs.readdir(UPLOADS_DIR);
+    for (const name of names) {
+      if (!/\.(webp|jpe?g|png|gif)$/i.test(name)) continue;
+      if (!map.has(`/uploads/${name}`)) rememberImage(map, `/uploads/${name}`, "Загружено ранее");
+    }
+  } catch {
+    // The uploads folder appears with the first admin upload.
+  }
+  return [...map.values()].sort((a, b) => b.url.localeCompare(a.url));
+}
+
+/** Accepts a site image path and rejects anything outside public/uploads and public/images. */
+export async function assertSiteImage(url: string): Promise<string> {
+  if (!SITE_IMAGE_PREFIXES.some((prefix) => url.startsWith(prefix)) || url.includes("..") || url.includes("\\")) {
+    throw new ContentError("Можно выбрать только фотографию, которая уже есть на сайте");
+  }
+  const publicRoot = path.resolve(path.join(process.cwd(), "public"));
+  const filePath = path.resolve(path.join(publicRoot, url));
+  if (!filePath.startsWith(publicRoot + path.sep)) {
+    throw new ContentError("Некорректный адрес фотографии");
+  }
+  try {
+    await fs.access(filePath);
+  } catch {
+    throw new ContentError("Файл фотографии не найден на сервере");
+  }
+  return url;
+}
+
+async function removeUploadedFileIfUnused(url: string) {
+  if (!url.startsWith("/uploads/")) return;
+  await mutate(async (content) => {
+    const stillUsed = [...imagesInContent(content).keys()].includes(url);
+    if (stillUsed) return;
+    try {
+      await fs.unlink(path.join(process.cwd(), "public", url));
+    } catch {
+      // Already gone — nothing to clean up.
+    }
+  });
 }
 
 /* ---------- photos ---------- */
@@ -346,9 +429,29 @@ export async function addPhotos(target: PhotoTarget, files: File[]): Promise<Pho
   files.forEach(validateImageFile);
   const urls: string[] = [];
   for (const file of files) urls.push(await saveUploadedImage(file));
+  return appendPhotos(target, urls);
+}
+
+/** Reuses photos that are already on the server instead of uploading them again. */
+export async function addExistingPhotos(target: PhotoTarget, urls: unknown): Promise<Photo[]> {
+  if (!Array.isArray(urls) || urls.length === 0) throw new ContentError("Выберите фотографию");
+  if (urls.length > 30) throw new ContentError("За один раз можно добавить не больше 30 фотографий");
+  const safe: string[] = [];
+  for (const url of urls) {
+    if (typeof url !== "string") throw new ContentError("Некорректный адрес фотографии");
+    const checked = await assertSiteImage(url);
+    if (!safe.includes(checked)) safe.push(checked);
+  }
+  return appendPhotos(target, safe);
+}
+
+function appendPhotos(target: PhotoTarget, urls: string[]): Promise<Photo[]> {
   return mutate((content) => {
     const list = photosOf(content, target);
-    const created = urls.map((url) => ({ id: randomUUID(), url, caption: "" }));
+    const created = urls
+      .filter((url) => !list.some((photo) => photo.url === url))
+      .map((url) => ({ id: randomUUID(), url, caption: "" }));
+    if (created.length === 0) throw new ContentError("Эти фотографии уже есть в этом разделе");
     list.push(...created);
     return created;
   });
@@ -383,21 +486,19 @@ export async function removePhoto(target: PhotoTarget, photoId: string): Promise
     if (index === -1) throw new ContentError("Фото не найдено", 404);
     return list.splice(index, 1)[0];
   });
-  await removeUploadedFile(removed.url);
+  await removeUploadedFileIfUnused(removed.url);
 }
 
 /* ---------- collections (locations & photo projects) ---------- */
 
 export async function createCollectionItem(
   collection: CollectionKind,
-  input: { title: string; description: string; cover: File | null },
+  input: { title: string; description: string; cover: File | null; existingCover?: string | null },
 ): Promise<CollectionItem> {
   const labels = collectionLabels[collection];
   const title = input.title.trim();
   if (!title) throw new ContentError(labels.needTitle);
-  if (!input.cover) throw new ContentError(labels.needCover);
-  validateImageFile(input.cover);
-  const cover = await saveUploadedImage(input.cover);
+  const cover = await resolveImage(input.cover, input.existingCover, labels.needCover);
   return mutate((content) => {
     const item: CollectionItem = {
       id: randomUUID(),
@@ -414,13 +515,15 @@ export async function createCollectionItem(
 export async function updateCollectionItem(
   collection: CollectionKind,
   id: string,
-  input: { title?: string; description?: string; cover?: File | null; move?: "up" | "down" },
+  input: {
+    title?: string;
+    description?: string;
+    cover?: File | null;
+    existingCover?: string | null;
+    move?: "up" | "down";
+  },
 ): Promise<CollectionItem> {
-  let newCover: string | null = null;
-  if (input.cover) {
-    validateImageFile(input.cover);
-    newCover = await saveUploadedImage(input.cover);
-  }
+  const newCover = await resolveOptionalImage(input.cover, input.existingCover);
   const { item, oldCover } = await mutate((content) => {
     const list = content[collection];
     const index = list.findIndex((entry) => entry.id === id);
@@ -439,7 +542,7 @@ export async function updateCollectionItem(
     }
     return { item, oldCover };
   });
-  if (newCover && oldCover !== newCover) await removeUploadedFile(oldCover);
+  if (newCover && oldCover !== newCover) await removeUploadedFileIfUnused(oldCover);
   return item;
 }
 
@@ -450,8 +553,8 @@ export async function deleteCollectionItem(collection: CollectionKind, id: strin
     if (index === -1) throw new ContentError(collectionLabels[collection].notFound, 404);
     return list.splice(index, 1)[0];
   });
-  await removeUploadedFile(item.cover);
-  for (const photo of item.photos) await removeUploadedFile(photo.url);
+  await removeUploadedFileIfUnused(item.cover);
+  for (const photo of item.photos) await removeUploadedFileIfUnused(photo.url);
 }
 
 /* ---------- equipment ---------- */
@@ -460,12 +563,11 @@ export async function createEquipment(input: {
   title: string;
   description: string;
   image: File | null;
+  existingImage?: string | null;
 }): Promise<EquipmentItem> {
   const title = input.title.trim();
   if (!title) throw new ContentError("Укажите название");
-  if (!input.image) throw new ContentError("Загрузите фото оборудования");
-  validateImageFile(input.image);
-  const image = await saveUploadedImage(input.image);
+  const image = await resolveImage(input.image, input.existingImage, "Загрузите фото оборудования");
   return mutate((content) => {
     const item: EquipmentItem = {
       id: randomUUID(),
@@ -480,13 +582,15 @@ export async function createEquipment(input: {
 
 export async function updateEquipment(
   id: string,
-  input: { title?: string; description?: string; image?: File | null; move?: "up" | "down" },
+  input: {
+    title?: string;
+    description?: string;
+    image?: File | null;
+    existingImage?: string | null;
+    move?: "up" | "down";
+  },
 ): Promise<EquipmentItem> {
-  let newImage: string | null = null;
-  if (input.image) {
-    validateImageFile(input.image);
-    newImage = await saveUploadedImage(input.image);
-  }
+  const newImage = await resolveOptionalImage(input.image, input.existingImage);
   const { item, oldImage } = await mutate((content) => {
     const index = content.equipment.findIndex((e) => e.id === id);
     if (index === -1) throw new ContentError("Позиция не найдена", 404);
@@ -504,7 +608,7 @@ export async function updateEquipment(
     }
     return { item, oldImage };
   });
-  if (newImage && oldImage !== newImage) await removeUploadedFile(oldImage);
+  if (newImage && oldImage !== newImage) await removeUploadedFileIfUnused(oldImage);
   return item;
 }
 
@@ -514,5 +618,23 @@ export async function deleteEquipment(id: string): Promise<void> {
     if (index === -1) throw new ContentError("Позиция не найдена", 404);
     return content.equipment.splice(index, 1)[0];
   });
-  await removeUploadedFile(item.image);
+  await removeUploadedFileIfUnused(item.image);
+}
+
+async function resolveImage(file: File | null, existing: string | null | undefined, missingMessage: string) {
+  if (file) {
+    validateImageFile(file);
+    return saveUploadedImage(file);
+  }
+  if (existing) return assertSiteImage(existing);
+  throw new ContentError(missingMessage);
+}
+
+async function resolveOptionalImage(file: File | null | undefined, existing: string | null | undefined) {
+  if (file) {
+    validateImageFile(file);
+    return saveUploadedImage(file);
+  }
+  if (existing) return assertSiteImage(existing);
+  return null;
 }
